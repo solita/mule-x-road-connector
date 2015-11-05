@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:xrd="http://x-road.ee/xsd/x-road.xsd" xmlns:xroad="http://x-road.eu/xsd/xroad.xsd"
+                  xmlns:ns="http://x-road.eu/xsd/identifiers" xmlns:items="http://xml.vrk.fi/ws/Rova/Delegate/Entities"
+                  xmlns:request="http://xml.vrk.fi/ws/Rova/Delegate/Request"
+                  xmlns:response="http://xml.vrk.fi/ws/Rova/Delegate/Response" xmlns:tns="http://xml.vrk.fi/ws/Rova/Delegate"
+                  name="RovaDelegate" targetNamespace="http://xml.vrk.fi/ws/Rova/Delegate">
+    <wsdl:types>
+        <xsd:schema>
+            <xsd:import namespace="http://x-road.eu/xsd/xroad.xsd"
+                        schemaLocation="xroad6.xsd" />
+        </xsd:schema>
+        <xsd:schema xmlns:tns="http://xml.vrk.fi/ws/Rova/Delegate/Entities"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xml.vrk.fi/ws/Rova/Delegate/Entities">
+            <xsd:complexType name="Request">
+                <xsd:sequence>
+                    <xsd:element name="delegateIdentifier">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Mandatory. Unique identifier of delegate
+                                entity.
+                                In example ssn, business ID or similar.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:simpleType>
+                            <xsd:restriction base="xsd:string" />
+                        </xsd:simpleType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="PrincipalType">
+                <xsd:sequence>
+                    <xsd:element name="identifier" type="xsd:string" />
+                    <xsd:element name="name" type="xsd:string" />
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="Principal">
+                <xsd:sequence>
+                    <xsd:element name="principal" maxOccurs="unbounded"
+                                 minOccurs="0" nillable="true" type="tns:PrincipalType" />
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="DecisionReasonType">
+                <xsd:sequence>
+                    <xsd:element name="rule" type="xsd:string" />
+                    <xsd:element name="value" type="xsd:string" />
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:simpleType name="AuthorizationType">
+                <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="ALLOWED" />
+                    <xsd:enumeration value="DISALLOWED" />
+                </xsd:restriction>
+            </xsd:simpleType>
+
+            <xsd:complexType name="Response">
+                <xsd:sequence>
+                    <xsd:element name="principalList" type="items:Principal" />
+                    <xsd:element name="authorization" type="items:AuthorizationType" />
+                    <xsd:element name="reason" maxOccurs="unbounded"
+                                 minOccurs="0" nillable="true" type="tns:DecisionReasonType" />
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:element name="rovaDelegateService">
+                <xsd:complexType id="Request">
+                    <xsd:sequence>
+                        <xsd:element name="request" type="items:Request" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="rovaDelegateServiceResponse">
+                <xsd:complexType id="Response">
+                    <xsd:sequence>
+                        <xsd:element name="request" type="items:Request" />
+                        <xsd:element name="response" type="items:Response" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="requestheader">
+        <wsdl:part name="client" element="xroad:client" />
+        <wsdl:part name="service" element="xroad:service" />
+        <wsdl:part name="userId" element="xroad:userId" />
+        <wsdl:part name="id" element="xroad:id" />
+        <wsdl:part name="async" element="xroad:async" />
+    </wsdl:message>
+    <wsdl:message name="rovaDelegateService">
+        <wsdl:part name="Request" element="items:rovaDelegateService" />
+    </wsdl:message>
+    <wsdl:message name="rovaDelegateServiceResponse">
+        <wsdl:part name="Response" element="items:rovaDelegateServiceResponse" />
+    </wsdl:message>
+    <wsdl:portType name="rovaDelegatePortType">
+        <wsdl:operation name="rovaDelegateService">
+            <wsdl:input name="rovaDelegateService" message="tns:rovaDelegateService" />
+            <wsdl:output name="rovaDelegateServiceResponse" message="tns:rovaDelegateServiceResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="rovaDelegateBinding" type="tns:rovaDelegatePortType">
+        <soap:binding style="document"
+                      transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="rovaDelegateService">
+            <soap:operation soapAction="" />
+            <xrd:version>v1</xrd:version>
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:requestheader" part="client"
+                             use="literal" />
+                <soap:header message="tns:requestheader" part="service"
+                             use="literal" />
+                <soap:header message="tns:requestheader" part="userId"
+                             use="literal" />
+                <soap:header message="tns:requestheader" part="id" use="literal" />
+                <soap:header message="tns:requestheader" part="async"
+                             use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+                <soap:header message="tns:requestheader" part="client"
+                             use="literal" />
+                <soap:header message="tns:requestheader" part="service"
+                             use="literal" />
+                <soap:header message="tns:requestheader" part="userId"
+                             use="literal" />
+                <soap:header message="tns:requestheader" part="id" use="literal" />
+                <soap:header message="tns:requestheader" part="async"
+                             use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="Rova_Delegate_Service">
+        <wsdl:documentation>WSDL-file for RoVa Delegate service
+        </wsdl:documentation>
+        <wsdl:port name="rovaDelegatePort" binding="tns:rovaDelegateBinding">
+            <soap:address location="http://localhost:8000/rova/delegate" />
+        </wsdl:port>
+    </wsdl:service>
+    <!-- Schema for identifiers (reduced) -->
+</wsdl:definitions>

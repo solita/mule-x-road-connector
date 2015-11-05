@@ -1,0 +1,3 @@
+<!-- BEGIN_INCLUDE(x-road:greet) -->
+    <x-road:greet config-ref="" friend="#[map-payload:friend]" />
+<!-- END_INCLUDE(x-road:greet) -->
