@@ -33,7 +33,6 @@ public class XRoadConnectionStrategy {
 	public void connect(@ConnectionKey String username,
 			@Password String password) throws ConnectionException {
 		client = new XRoadClient();
-		client.initialize();
 	}
 
 	@Disconnect

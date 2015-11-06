@@ -25,7 +25,7 @@ public class XRoadConnector {
 	public Object sendMessage(@Default("#[payload]") Object payload) {
 		XRoadHeaders xRoadHeaders = new XRoadHeaders("testi-id", null, null, null, null, null, null, null, null, null, null, null);
 		//String endpointUrl = "http://localhost:8088/mockrovaDelegateBinding";
-		return connectionStrategy.getClient().sendRaw(payload, xRoadHeaders, connectionStrategy.getEndpointUrl());
+		return connectionStrategy.getClient().send(payload, xRoadHeaders, connectionStrategy.getEndpointUrl());
 	}
 
 
