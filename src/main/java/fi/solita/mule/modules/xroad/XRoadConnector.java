@@ -1,6 +1,11 @@
 package fi.solita.mule.modules.xroad;
 
 
+import java.io.StringWriter;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
 import org.mule.api.annotations.Config;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Processor;
@@ -27,7 +32,8 @@ public class XRoadConnector {
 	@Processor
 	public Object sendMessage(@Default("#[payload]") Object payload) {
 		XRoadHeaders xRoadHeaders = new XRoadHeaders("testi-id", null, null, null, null, null, null, null, null, null, null, null);
-		return connectionStrategy.getClient().send(payload, xRoadHeaders);
+		String endpointUrl = "http://localhost:8088/mockrovaDelegateBinding";
+		return connectionStrategy.getClient().sendRaw(payload, xRoadHeaders, endpointUrl);
 	}
 
 

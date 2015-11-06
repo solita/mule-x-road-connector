@@ -2,6 +2,14 @@
 package fi.solita.mule.modules.xroad.automation.testcases;
 
 import static org.junit.Assert.*;
+
+import java.io.StringWriter;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
+import fi.solita.mule.modules.xroad.api.RovaDelegateService;
 import fi.solita.mule.modules.xroad.automation.AbstractTestCase;
 
 import org.junit.After;
@@ -29,9 +37,12 @@ public class SendMessageTestCases
 
     @Test
     //@Category(RegressionTests.class)
-    public void testSendMessage() {
-        //TODO: You need to call directly the methods of the connector being tested as follows 
-        Object result = getConnector().sendMessage("testi");
+    public void testSendMessage() throws JAXBException {
+    	RovaDelegateService request = new RovaDelegateService();
+    	
+    	
+    	
+        Object result = getConnector().sendMessage(request);
         assertNotNull(result);
     }
 
