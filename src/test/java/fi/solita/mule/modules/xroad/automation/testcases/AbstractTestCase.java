@@ -23,16 +23,10 @@ public abstract class AbstractTestCase {
 
 	@Before
 	public void init() throws Exception {
-		
-		//Initialization for single-test run
         ConnectorTestContext.initialize(XRoadConnector.class, false);
-		
-		//Context instance
-		ConnectorTestContext<XRoadConnector> context = ConnectorTestContext.getInstance(XRoadConnector.class);
-		
-		//Connector dispatcher
+	
+		ConnectorTestContext<XRoadConnector> context = ConnectorTestContext.getInstance();
 		dispatcher = context.getConnectorDispatcher();
-		
 		connector = dispatcher.createMockup();
 		
 	}

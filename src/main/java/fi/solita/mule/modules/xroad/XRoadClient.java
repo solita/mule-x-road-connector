@@ -26,6 +26,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Message;
+import org.w3c.dom.Document;
 
 import eu.x_road.xsd.identifiers.XRoadClientIdentifierType;
 import eu.x_road.xsd.identifiers.XRoadObjectType;
@@ -83,13 +84,14 @@ public class XRoadClient {
 		headers.add(operationNameHeader);
 	}
 
-	public Object sendRaw(Object payload, XRoadHeaders xRoadHeaders, String endpointUrl) {
+	public Object sendRaw(Object payload, XRoadHeaders xRoadHeaders,
+			String endpointUrl) {
 		try {
 
 			QName serviceName = new QName("", "");
 			QName portName = new QName("", "");
 			Service service = Service.create(serviceName);
-			
+
 			service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING,
 					endpointUrl);
 			Dispatch<SOAPMessage> dispatch = service.createDispatch(portName,
@@ -112,9 +114,9 @@ public class XRoadClient {
 					BindingProvider.SOAPACTION_USE_PROPERTY, true);
 			dispatch.getRequestContext().put(
 					BindingProvider.SOAPACTION_URI_PROPERTY, "");
-		
+
 			SOAPMessage response = dispatch.invoke(request);
-			return response.getSOAPBody().extractContentAsDocument();			
+			return response.getSOAPBody().extractContentAsDocument();
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to send message ", e);
 		}
@@ -122,32 +124,35 @@ public class XRoadClient {
 
 	private void buildBody(Object payload, SOAPBody body) throws JAXBException,
 			SOAPException {
-		JAXBContext context = JAXBContext.newInstance(payload.getClass());
-		final Marshaller marshaller = context.createMarshaller();
-		marshaller.marshal(payload, body);
+		if (payload instanceof Document) {
+			Document document = (Document) payload;
+			body.addDocument(document);
+		} else {
+			JAXBContext context = JAXBContext.newInstance(payload.getClass());
+			final Marshaller marshaller = context.createMarshaller();
+			marshaller.marshal(payload, body);
+		}
 	}
 
 	private void buildHeader(XRoadHeaders xRoadHeaders, SOAPHeader header)
 			throws SOAPException, JAXBException {
 		XRoadClientIdentifierType client = new XRoadClientIdentifierType();
-        client.setObjectType(XRoadObjectType.SUBSYSTEM);
-        client.setXRoadInstance(xRoadHeaders.clientXroadInstance);
-        client.setMemberClass(xRoadHeaders.clientMemberClass);
+		client.setObjectType(XRoadObjectType.SUBSYSTEM);
+		client.setXRoadInstance(xRoadHeaders.clientXroadInstance);
+		client.setMemberClass(xRoadHeaders.clientMemberClass);
 
-        client.setMemberCode(xRoadHeaders.clientMemberCode);
-        client.setSubsystemCode(xRoadHeaders.clientSubsystemCode);
+		client.setMemberCode(xRoadHeaders.clientMemberCode);
+		client.setSubsystemCode(xRoadHeaders.clientSubsystemCode);
 
-        XRoadServiceIdentifierType service = new XRoadServiceIdentifierType();
-        service.setObjectType(XRoadObjectType.SERVICE);
-        service.setXRoadInstance(xRoadHeaders.serviceXroadInstance);
-        service.setMemberClass(xRoadHeaders.serviceMemberClass);
-        service.setMemberCode(xRoadHeaders.serviceMemberCode);
-        service.setSubsystemCode(xRoadHeaders.serviceSubsystemCode);
-        service.setServiceCode(xRoadHeaders.serviceServiceCode);
-        service.setServiceVersion(xRoadHeaders.serviceServiceVersion);
-		
-		
-		
+		XRoadServiceIdentifierType service = new XRoadServiceIdentifierType();
+		service.setObjectType(XRoadObjectType.SERVICE);
+		service.setXRoadInstance(xRoadHeaders.serviceXroadInstance);
+		service.setMemberClass(xRoadHeaders.serviceMemberClass);
+		service.setMemberCode(xRoadHeaders.serviceMemberCode);
+		service.setSubsystemCode(xRoadHeaders.serviceSubsystemCode);
+		service.setServiceCode(xRoadHeaders.serviceServiceCode);
+		service.setServiceVersion(xRoadHeaders.serviceServiceVersion);
+
 		eu.x_road.xsd.xroad.ObjectFactory xroadOf = new eu.x_road.xsd.xroad.ObjectFactory();
 		JAXBContext xRoadContext = JAXBContext
 				.newInstance("eu.x_road.xsd.xroad");

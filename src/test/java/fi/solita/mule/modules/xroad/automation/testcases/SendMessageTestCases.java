@@ -1,49 +1,46 @@
 
 package fi.solita.mule.modules.xroad.automation.testcases;
 
-import static org.junit.Assert.*;
-
-import java.io.StringWriter;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+
+import org.junit.Test;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.TransformerException;
+import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
+import org.mule.transformer.types.SimpleDataType;
+import org.w3c.dom.Document;
 
 import fi.solita.mule.modules.xroad.api.RovaDelegateService;
 import fi.solita.mule.modules.xroad.automation.AbstractTestCase;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.mule.tools.devkit.ctf.junit.RegressionTests;
 
 public class SendMessageTestCases
     extends AbstractTestCase
 {
 
 
-    @Before
-    public void setUp() {
-        //TODO: Add code to add @Before behaviour to your test.
-    }
-
-    @After
-    public void tearDown()
-        throws Exception
-    {
-        //TODO: Add code to reset sandbox state to the one before the test was run or remove.
-    }
-
     @Test
     //@Category(RegressionTests.class)
-    public void testSendMessage() throws JAXBException {
+    public void testSendMessage() throws JAXBException, InitialisationException, TransformerException {
     	RovaDelegateService request = new RovaDelegateService();
     	
-    	
-    	
-        Object result = getConnector().sendMessage(request);
+    	JAXBMarshallerTransformer transformer = getJaxbMarshallerTransformer(Document.class);
+    	Document doc = (Document) transformer.transform(request);
+        Object result = getConnector().sendMessage(doc);
         assertNotNull(result);
+        assertTrue(result instanceof Document);
     }
+
+	private <T> JAXBMarshallerTransformer getJaxbMarshallerTransformer(Class<T> returnDataType)
+			throws JAXBException, InitialisationException {
+		JAXBContext context = JAXBContext.newInstance(RovaDelegateService.class);
+    	JAXBMarshallerTransformer transformer = new JAXBMarshallerTransformer(context, new SimpleDataType<T>(returnDataType));
+   
+    	transformer.initialise();
+		return transformer;
+	}
 
 }

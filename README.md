@@ -1,4 +1,4 @@
-# XRoad Anypoint Connector
+# X-Road Anypoint Connector
 
 [Connector description including destination service or application with]
 
