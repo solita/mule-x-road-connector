@@ -47,12 +47,13 @@ public class XRoadConnector {
 			@Optional String serviceSubsystemCode,
 			@Optional String serviceServiceCode,
 			@Optional String serviceServiceVersion,
-			@Optional String userId
+			@Optional String userId,
+			@Optional String protocolVersion
 			) {
 	    XRoadHeaders overridedHeaders = new XRoadHeaders(UUID.getUUID(), clientXroadInstance, clientMemberClass,
                 clientMemberCode, clientSubsystemCode, serviceXroadInstance,
                 serviceMemberClass, serviceMemberCode, serviceSubsystemCode,
-                serviceServiceCode, serviceServiceVersion, userId);
+                serviceServiceCode, serviceServiceVersion, userId, protocolVersion);
 	
 		return config.getClient().send(payload, config.getXRoadHeaders().merge(overridedHeaders), config.getEndpointUrl());
 	}

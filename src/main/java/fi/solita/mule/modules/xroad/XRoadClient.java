@@ -98,9 +98,11 @@ public class XRoadClient {
 		JAXBContext xRoadContext = JAXBContext
 				.newInstance("eu.x_road.xsd.xroad");
 		final Marshaller marshaller = xRoadContext.createMarshaller();
-		marshaller.marshal(xroadOf.createId(xRoadHeaders.id), header);
-		marshaller.marshal(xroadOf.createUserId(xRoadHeaders.userId), header);
 		marshaller.marshal(xroadOf.createClient(client), header);
 		marshaller.marshal(xroadOf.createService(service), header);
+		marshaller.marshal(xroadOf.createUserId(xRoadHeaders.userId), header);
+		marshaller.marshal(xroadOf.createId(xRoadHeaders.id), header);
+		marshaller.marshal(xroadOf.createProtocolVersion(xRoadHeaders.protocolVersion), header);
+        
 	}
 }

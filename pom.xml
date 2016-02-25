@@ -36,81 +36,32 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${basedir}/target/generated-sources/cxf</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-test-source</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${basedir}/target/generated-test-sources/cxf</source>
+                                <source>${basedir}/target/generated-sources/jaxb</source>
                             </sources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                    <execution>
+                        <id>xjc</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sources>
+                        <source>src/main/resources/xsd</source>
+                    </sources>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>cxf-generate</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-codegen-plugin</artifactId>
-                        <version>${cxf.version}</version>
-                        <executions>
-                            <execution>
-                                <phase>validate</phase> <!-- This is so it work with the Devkit -->
-                                <goals>
-                                    <goal>wsdl2java</goal>
-                                </goals>
-                                <configuration>
-                                	<sourceRoot>${project.build.directory}/generated-test-sources/cxf</sourceRoot>
-                                    <wsdlOptions>
-                                        <wsdlOption>
-                                            <wsdl>${basedir}/src/test/resources/wsdl/delegate.wsdl</wsdl>
-                                            <autoNameResolution>true</autoNameResolution>
-                                            <extendedSoapHeaders>false</extendedSoapHeaders>
-                                            <extraargs>
-                                                <!--  extraarg>-xjc-Xbg</extraarg>
-                                                <extraarg>-xjc-Xcollection-setter-injector</extraarg -->
-                                                <extraarg>-b</extraarg>
-                                                <extraarg>${basedir}/src/test/resources/wsdl/binding.xml</extraarg>
-                                                <extraarg>-p</extraarg>
-                                                <extraarg>fi.solita.mule.modules.xroad.api</extraarg>
-                                            </extraargs>
-                                        </wsdlOption>
-                                    </wsdlOptions>
-                                </configuration>
-                            </execution>
-                        </executions>
-                        <!-- dependencies>
-                            <dependency>
-                                <groupId>org.apache.cxf.xjcplugins</groupId>
-                                <artifactId>cxf-xjc-boolean</artifactId>
-                                <version>${cxf.version.boolean}</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>net.java.dev.vcc.thirdparty</groupId>
-                                <artifactId>collection-setter-injector</artifactId>
-                                <version>0.5.0-1</version>
-                            </dependency>
-                        </dependencies -->
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>

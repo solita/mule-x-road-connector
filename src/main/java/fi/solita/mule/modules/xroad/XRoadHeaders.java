@@ -15,13 +15,14 @@ public class XRoadHeaders {
 	public final String serviceServiceCode;
 	public final String serviceServiceVersion;
 	public final String userId;
+	public final String protocolVersion;
 	
 	public XRoadHeaders(String id, String clientXroadInstance,
 			String clientMemberClass, String clientMemberCode,
 			String clientSubsystemCode, String serviceXroadInstance,
 			String serviceMemberClass, String serviceMemberCode,
 			String serviceSubsystemCode, String serviceServiceCode,
-			String serviceServiceVersion, String userId) {
+			String serviceServiceVersion, String userId, String protocolVersion) {
 		this.id = id;
 		this.clientXroadInstance = clientXroadInstance;
 		this.clientMemberClass = clientMemberClass;
@@ -34,6 +35,7 @@ public class XRoadHeaders {
 		this.serviceServiceCode = serviceServiceCode;
 		this.serviceServiceVersion = serviceServiceVersion;
 		this.userId = userId;
+		this.protocolVersion = protocolVersion;
 	}
 	
 	/**
@@ -55,7 +57,8 @@ public class XRoadHeaders {
 		    defaultString(overridedHeaders.serviceSubsystemCode,serviceSubsystemCode),
 		    defaultString(overridedHeaders.serviceServiceCode, serviceServiceCode),
 		    defaultString(overridedHeaders.serviceServiceVersion, serviceServiceVersion),
-		    defaultString(overridedHeaders.userId, userId));
+		    defaultString(overridedHeaders.userId, userId),
+		    defaultString(overridedHeaders.protocolVersion, protocolVersion));
 		return result;
 	}
 	

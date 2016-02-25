@@ -3,7 +3,7 @@ package fi.solita.mule.modules.xroad;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.components.Configuration;
 
-@Configuration(friendlyName = "Configuration")
+@Configuration(friendlyName = "Configuration", configElementName = "x-road")
 public class XRoadConnectorConfig {
 
     private XRoadClient client = new XRoadClient();
@@ -46,6 +46,9 @@ public class XRoadConnectorConfig {
 
     @Configurable
     public String userId;
+    
+    @Configurable
+    public String protocolVersion;
 
     public String getEndpointUrl() {
         return endpointUrl;
@@ -147,6 +150,14 @@ public class XRoadConnectorConfig {
         this.client = client;
     }
 
+    public String getProtocolVersion() {
+        return protocolVersion;
+    }
+
+    public void setProtocolVersion(String protocolVersion) {
+        this.protocolVersion = protocolVersion;
+    }
+
     public XRoadClient getClient() {
         return client;
     }
@@ -155,7 +166,7 @@ public class XRoadConnectorConfig {
         return new XRoadHeaders(null, clientXroadInstance, clientMemberClass,
                 clientMemberCode, clientSubsystemCode, serviceXroadInstance,
                 serviceMemberClass, serviceMemberCode, serviceSubsystemCode,
-                serviceServiceCode, serviceServiceVersion, userId);
+                serviceServiceCode, serviceServiceVersion, userId, protocolVersion);
 
     }
 
