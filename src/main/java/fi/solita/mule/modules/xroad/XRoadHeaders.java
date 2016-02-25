@@ -1,5 +1,7 @@
 package fi.solita.mule.modules.xroad;
 
+import static org.apache.commons.lang.StringUtils.defaultString;
+
 public class XRoadHeaders {
 	public final String id;
 	public final String clientXroadInstance;
@@ -32,6 +34,29 @@ public class XRoadHeaders {
 		this.serviceServiceCode = serviceServiceCode;
 		this.serviceServiceVersion = serviceServiceVersion;
 		this.userId = userId;
+	}
+	
+	/**
+	 * @param overridedHeaders Headers to merge. Non null values are taken from here
+	 * @return New object of merged headers with values taken from overridedHeaders if they are not null.
+	 * Otherwise current values are returned
+	 */
+	public XRoadHeaders merge(XRoadHeaders overridedHeaders) {
+		
+		XRoadHeaders result = new XRoadHeaders(
+			defaultString(overridedHeaders.id, id),
+			defaultString(overridedHeaders.clientXroadInstance, clientXroadInstance),
+			defaultString(overridedHeaders.clientMemberClass, clientMemberClass),
+		    defaultString(overridedHeaders.clientMemberCode, clientMemberCode),
+		    defaultString(overridedHeaders.clientSubsystemCode, clientSubsystemCode),
+		    defaultString(overridedHeaders.serviceXroadInstance, serviceXroadInstance),
+		    defaultString(overridedHeaders.serviceMemberClass, serviceMemberClass),
+		    defaultString(overridedHeaders.serviceMemberCode, serviceMemberCode),
+		    defaultString(overridedHeaders.serviceSubsystemCode,serviceSubsystemCode),
+		    defaultString(overridedHeaders.serviceServiceCode, serviceServiceCode),
+		    defaultString(overridedHeaders.serviceServiceVersion, serviceServiceVersion),
+		    defaultString(overridedHeaders.userId, userId));
+		return result;
 	}
 	
 	
