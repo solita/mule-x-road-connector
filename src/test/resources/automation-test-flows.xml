@@ -17,7 +17,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
  
 <flow name="send-message" >
         <set-payload value="#['&lt;ns2:helloService xmlns:ns2=&quot;http://test.x-road.fi/producer&quot;&gt;&lt;request&gt;&lt;name&gt;FI-DEV/COM/1060155-5/mule@Solita!&lt;/name&gt;&lt;/request&gt;&lt;/ns2:helloService&gt;']" doc:name="Set Payload"/>
-        <mulexml:xml-to-dom-transformer doc:name="XML to DOM"/>
+        <mulexml:xml-to-dom-transformer doc:name="XML to DOM" returnClass="org.w3c.dom.Document"/>
     
         <x-road:send-message config-ref="X_Road__Configuration" doc:name="X-Road" serviceServiceCode="helloService" serviceServiceVersion="v1"/>
        
