@@ -2,6 +2,8 @@ package fi.solita.mule.modules.xroad;
 
 import static org.apache.commons.lang.StringUtils.defaultString;
 
+import java.util.Objects;
+
 public class XRoadHeaders {
 	public final String id;
 	public final String clientXroadInstance;
@@ -60,6 +62,22 @@ public class XRoadHeaders {
 		    defaultString(overridedHeaders.userId, userId),
 		    defaultString(overridedHeaders.protocolVersion, protocolVersion));
 		return result;
+	}
+	
+	public void validate() {
+	    Objects.requireNonNull(id, "id must not be null");
+	    Objects.requireNonNull(clientXroadInstance, "clientXroadInstance must not be null");
+	    Objects.requireNonNull(clientMemberClass, "clientMemberClass must not be null");
+        Objects.requireNonNull(clientMemberCode, "clientMemberCode must not be null");
+        Objects.requireNonNull(clientSubsystemCode, "clientSubsystemCode must not be null");
+        Objects.requireNonNull(serviceXroadInstance, "serviceXroadInstance must not be null");
+        Objects.requireNonNull(serviceMemberClass, "serviceMemberClass must not be null");
+        Objects.requireNonNull(serviceMemberCode, "serviceMemberCode must not be null");
+        Objects.requireNonNull(serviceSubsystemCode, "serviceSubsystemCode must not be null");
+        Objects.requireNonNull(serviceServiceCode, "serviceServiceCode must not be null");
+        Objects.requireNonNull(serviceServiceVersion, "serviceServiceVersion must not be null");
+        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(protocolVersion, "protocolVersion must not be null");
 	}
 	
 	

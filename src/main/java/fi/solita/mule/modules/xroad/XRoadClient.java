@@ -28,7 +28,7 @@ public class XRoadClient {
 	public Object send(Object payload, XRoadHeaders xRoadHeaders,
 			String endpointUrl) {
 		try {
-
+		    xRoadHeaders.validate();
 			QName serviceName = new QName("", "");
 			QName portName = new QName("", "");
 			Service service = Service.create(serviceName);

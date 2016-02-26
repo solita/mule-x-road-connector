@@ -11,7 +11,7 @@ public class XRoadFunctionalTest extends FunctionalTestCase {
     }
     
     @Test
-    public void foo() {
-        
+    public void foo() throws Exception {
+       runFlow("send-message"); 
     }
 }
