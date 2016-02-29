@@ -1,6 +1,7 @@
 package fi.solita.mule.modules.xroad;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
@@ -12,12 +13,14 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
-import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import eu.x_road.xsd.identifiers.XRoadClientIdentifierType;
 import eu.x_road.xsd.identifiers.XRoadObjectType;
@@ -29,15 +32,6 @@ public class XRoadClient {
 			String endpointUrl) {
 		try {
 		    xRoadHeaders.validate();
-			QName serviceName = new QName("", "");
-			QName portName = new QName("", "");
-			Service service = Service.create(serviceName);
-
-			service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING,
-					endpointUrl);
-			Dispatch<SOAPMessage> dispatch = service.createDispatch(portName,
-					SOAPMessage.class, Service.Mode.MESSAGE);
-
 			MessageFactory mf = MessageFactory
 					.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
 
@@ -50,18 +44,50 @@ public class XRoadClient {
 			buildHeader(xRoadHeaders, env.getHeader());
 
 			request.saveChanges();
-
-			dispatch.getRequestContext().put(
-					BindingProvider.SOAPACTION_USE_PROPERTY, true);
-			dispatch.getRequestContext().put(
-					BindingProvider.SOAPACTION_URI_PROPERTY, "");
-
-			SOAPMessage response = dispatch.invoke(request);
+			
+			SOAPMessage response = getDispatch(endpointUrl).invoke(request);
+			
+			//System.err.println(parseHeaders(response.getSOAPHeader()));
 			return response.getSOAPBody().extractContentAsDocument();
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to send message ", e);
 		}
 	}
+	
+	private Node single(NodeList nodeList) {
+	    if (nodeList.getLength() != 1) {
+	        throw new IllegalArgumentException("Assumed exactly one element in " + nodeList + " but was " + nodeList.getLength());
+	    }
+	        
+	    return nodeList.item(0);
+	}
+
+    private XRoadHeaders parseHeaders(SOAPHeader soapHeader) throws JAXBException {
+       
+        Node clientNode = single(soapHeader.getElementsByTagNameNS("http://x-road.eu/xsd/xroad.xsd", "client"));
+        System.err.println(soapHeader.getChildNodes().item(0));
+        XRoadClientIdentifierType client = getXRoadContext().createUnmarshaller().unmarshal(clientNode, XRoadClientIdentifierType.class).getValue();
+        System.err.println(ReflectionToStringBuilder.toString(client));
+        
+        /*
+        XRoadHeaders result = new XRoadHeaders(soapHeader.getc, clientXroadInstance, clientMemberClass,
+                clientMemberCode, clientSubsystemCode, serviceXroadInstance,
+                serviceMemberClass, serviceMemberCode, serviceSubsystemCode,
+                serviceServiceCode, serviceServiceVersion, userId, protocolVersion);*/
+        return null;
+    }
+
+    private Dispatch<SOAPMessage> getDispatch(String endpointUrl) {
+        QName serviceName = new QName("", "");
+        QName portName = new QName("", "");
+        Service service = Service.create(serviceName);
+
+        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING,
+        		endpointUrl);
+        Dispatch<SOAPMessage> dispatch = service.createDispatch(portName,
+        		SOAPMessage.class, Service.Mode.MESSAGE);
+        return dispatch;
+    }
 
 	private void buildBody(Object payload, SOAPBody body) throws JAXBException,
 			SOAPException {
@@ -95,9 +121,7 @@ public class XRoadClient {
 		service.setServiceVersion(xRoadHeaders.serviceServiceVersion);
 
 		eu.x_road.xsd.xroad.ObjectFactory xroadOf = new eu.x_road.xsd.xroad.ObjectFactory();
-		JAXBContext xRoadContext = JAXBContext
-				.newInstance("eu.x_road.xsd.xroad");
-		final Marshaller marshaller = xRoadContext.createMarshaller();
+		final Marshaller marshaller = getXRoadContext().createMarshaller();
 		marshaller.marshal(xroadOf.createClient(client), header);
 		marshaller.marshal(xroadOf.createService(service), header);
 		marshaller.marshal(xroadOf.createUserId(xRoadHeaders.userId), header);
@@ -105,4 +129,10 @@ public class XRoadClient {
 		marshaller.marshal(xroadOf.createProtocolVersion(xRoadHeaders.protocolVersion), header);
         
 	}
+
+    private JAXBContext getXRoadContext() throws JAXBException {
+        JAXBContext xRoadContext = JAXBContext
+				.newInstance("eu.x_road.xsd.xroad");
+        return xRoadContext;
+    }
 }
