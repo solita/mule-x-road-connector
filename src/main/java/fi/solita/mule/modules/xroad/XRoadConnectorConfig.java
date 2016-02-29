@@ -2,6 +2,7 @@ package fi.solita.mule.modules.xroad;
 
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.components.Configuration;
+import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 
 @Configuration(friendlyName = "Configuration", configElementName = "x-road")
@@ -51,6 +52,8 @@ public class XRoadConnectorConfig {
     public String userId;
     
     @Configurable
+    @Optional
+    @Default("4.0")
     public String protocolVersion;
 
     public String getEndpointUrl() {

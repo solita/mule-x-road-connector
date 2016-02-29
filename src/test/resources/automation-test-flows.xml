@@ -13,7 +13,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
 >
 
 <context:property-placeholder location="automation-credentials.properties" />
-    <x-road:x-road name="X_Road__Configuration" clientMemberClass="COM" clientMemberCode="1060155-5" clientSubsystemCode="mule" clientXroadInstance="FI-DEV" endpointUrl="http://solilipa01.solita.fi/" protocolVersion="4.0" serviceMemberClass="GOV" serviceMemberCode="0245437-2" serviceSubsystemCode="TestService" serviceXroadInstance="FI-DEV" userId="test" doc:name="X-Road: Configuration"/>
+    <x-road:x-road name="X_Road__Configuration" clientMemberClass="COM" clientMemberCode="1060155-5" clientSubsystemCode="mule" clientXroadInstance="FI-DEV" endpointUrl="http://solilipa01.solita.fi/" serviceMemberClass="GOV" serviceMemberCode="0245437-2" serviceSubsystemCode="TestService" serviceXroadInstance="FI-DEV" userId="test" doc:name="X-Road: Configuration"/>
  
 <flow name="send-message" >
         <set-payload value="#['&lt;ns2:helloService xmlns:ns2=&quot;http://test.x-road.fi/producer&quot;&gt;&lt;request&gt;&lt;name&gt;FI-DEV/COM/1060155-5/mule@Solita!&lt;/name&gt;&lt;/request&gt;&lt;/ns2:helloService&gt;']" doc:name="Set Payload"/>
