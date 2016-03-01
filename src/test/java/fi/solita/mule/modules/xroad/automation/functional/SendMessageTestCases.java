@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.HashMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -37,10 +36,10 @@ public class SendMessageTestCases extends AbstractTestCase<XRoadConnector> {
     @Test
     public void testSendMessage() throws Exception {
     	Document doc = getHelloServiceRequest();
-        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, null, null, null, null, /* new HashMap<String, Object>() */ null);
+        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         assertNotNull(result);
         assertTrue(result instanceof Document);
-        System.err.println(getStringFromDocument((Document) result));
+        System.out.println(getStringFromDocument((Document) result));
     }
     
     public Document getHelloServiceRequest() throws Exception {

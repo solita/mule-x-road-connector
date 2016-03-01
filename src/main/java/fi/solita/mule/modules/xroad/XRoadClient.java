@@ -3,6 +3,7 @@ package fi.solita.mule.modules.xroad;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
@@ -73,11 +74,12 @@ public class XRoadClient {
 	}
 
     private XRoadHeaders parseHeaders(SOAPHeader soapHeader) throws JAXBException {
-        XRoadClientIdentifierType client = getXroadHeaderJaxbElement(soapHeader, "client", XRoadClientIdentifierType.class);
-        XRoadServiceIdentifierType service = getXroadHeaderJaxbElement(soapHeader, "service", XRoadServiceIdentifierType.class);
-        String userId = getXroadHeaderJaxbElement(soapHeader, "userId", String.class);
-        String id = getXroadHeaderJaxbElement(soapHeader, "id", String.class);
-        String protocolVersion = getXroadHeaderJaxbElement(soapHeader, "protocolVersion", String.class);
+        Unmarshaller unmarshaller = getXRoadContext().createUnmarshaller();
+        XRoadClientIdentifierType client = getXroadHeaderJaxbElement(soapHeader, "client", XRoadClientIdentifierType.class, unmarshaller);
+        XRoadServiceIdentifierType service = getXroadHeaderJaxbElement(soapHeader, "service", XRoadServiceIdentifierType.class, unmarshaller);
+        String userId = getXroadHeaderJaxbElement(soapHeader, "userId", String.class, unmarshaller);
+        String id = getXroadHeaderJaxbElement(soapHeader, "id", String.class, unmarshaller);
+        String protocolVersion = getXroadHeaderJaxbElement(soapHeader, "protocolVersion", String.class, unmarshaller);
         // Should requesthash be readed also?
         
         XRoadHeaders result = new XRoadHeaders(id, client.getXRoadInstance(), client.getMemberClass(),
@@ -88,10 +90,9 @@ public class XRoadClient {
     }
 
     private <T> T getXroadHeaderJaxbElement(
-            SOAPHeader soapHeader, String elementName, Class<T> elementClass) throws JAXBException {
+            SOAPHeader soapHeader, String elementName, Class<T> elementClass, Unmarshaller unmarshaller) throws JAXBException {
         Node clientNode = getXroadHeaderNode(soapHeader, elementName);
-        System.err.println(clientNode);
-        return getXRoadContext().createUnmarshaller().unmarshal(clientNode, elementClass).getValue();
+        return unmarshaller.unmarshal(clientNode, elementClass).getValue();
     }
 
     private Node getXroadHeaderNode(SOAPHeader soapHeader, String elementName) {

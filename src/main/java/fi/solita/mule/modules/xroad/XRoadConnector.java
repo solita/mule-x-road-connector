@@ -15,6 +15,12 @@ import org.mule.util.UUID;
 
 import fi.solita.mule.modules.xroad.XRoadClient.Result;
 
+/**
+ * Connector implements 
+ * {@see <a href="http://esuomi.fi/?mdocs-file=2268&mdocs-url=false">X-Road protocol for adapter server messaging v4.0</a>}
+ * used in X-Road 6.0.
+ *
+ */
 @Connector(name = "x-road", description = "X-Road Connector", friendlyName = "X-Road")
 public class XRoadConnector {
 
@@ -26,9 +32,9 @@ public class XRoadConnector {
 
 	/**
 	 * Custom processor that sends xroad message. Optional values are taken from connector but can be
-	 * overridden
+	 * overridden.
 	 * 
-	 * @param payload JAXB payload or Document, which is sent
+	 * @param payload JAXB payload or {@link org.w3c.dom.Document}, which is sent
 	 * @param id X-Road header
 	 * @param clientXroadInstance X-Road header
 	 * @param clientMemberClass X-Road header
@@ -41,8 +47,8 @@ public class XRoadConnector {
      * @param serviceServiceCode X-Road header
      * @param serviceServiceVersion X-Road header
      * @param userId X-Road header
-	 * @return returns reponse message. Following x-road headers are set to outbound properties:
-	 * X-Road-clientMemberClass, X-Road-serviceXroadInstance, X-Road-userId, X-Road-clientSubsystemCode, X-Road-serviceSubsystemCode, X-Road-id, X-Road-clientMemberCode, X-Road-serviceMemberCode, X-Road-serviceServiceCode, X-Road-protocolVersion, X-Road-serviceMemberClass, X-Road-serviceServiceVersion, X-Road-clientXroadInstance
+     * @param protocolVersion X-Road header
+	 * @return returns reponse message. Following x-road headers are set to outbound properties: X-Road-clientMemberClass, X-Road-serviceXroadInstance, X-Road-userId, X-Road-clientSubsystemCode, X-Road-serviceSubsystemCode, X-Road-id, X-Road-clientMemberCode, X-Road-serviceMemberCode, X-Road-serviceServiceCode, X-Road-protocolVersion, X-Road-serviceMemberClass, X-Road-serviceServiceVersion, X-Road-clientXroadInstance 
 	 */
 	@Processor
 	public Object sendMessage(@Default("#[payload]") Object payload,

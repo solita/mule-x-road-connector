@@ -16,41 +16,77 @@ public class XRoadConnectorConfig {
     @Configurable
     private String endpointUrl;
 
+    /**
+     * X-Road header
+     */
     @Configurable
     public String clientXroadInstance;
 
+    /**
+     * X-Road header
+     */
     @Configurable
     public String clientMemberClass;
 
+    /**
+     * X-Road header
+     */
     @Configurable
     public String clientMemberCode;
 
+    /**
+     * X-Road header
+     */
     @Configurable
     public String clientSubsystemCode;
 
+    /**
+     * X-Road header
+     */
     @Configurable
     public String serviceXroadInstance;
 
+    /**
+     * X-Road header
+     */
     @Configurable
     public String serviceMemberClass;
 
+    /**
+     * X-Road header
+     */
     @Configurable
     public String serviceMemberCode;
 
+    /**
+     * X-Road header
+     */
     @Configurable
     public String serviceSubsystemCode;
 
+    /**
+     * X-Road header. Probably you want to configure this where you use the connector.
+     */
     @Configurable
     @Optional
     public String serviceServiceCode;
 
+    /**
+     * X-Road header. Probably you want to configure this where you use the connector.
+     */
     @Configurable
     @Optional
     public String serviceServiceVersion;
 
+    /**
+     * X-Road header
+     */
     @Configurable
     public String userId;
     
+    /**
+     * X-Road header
+     */
     @Configurable
     @Optional
     @Default("4.0")
