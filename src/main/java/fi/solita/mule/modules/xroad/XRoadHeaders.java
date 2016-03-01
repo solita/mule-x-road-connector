@@ -4,6 +4,8 @@ import static org.apache.commons.lang.StringUtils.defaultString;
 
 import java.util.Objects;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 public class XRoadHeaders {
 	public final String id;
 	public final String clientXroadInstance;
@@ -79,6 +81,9 @@ public class XRoadHeaders {
         Objects.requireNonNull(userId, "userId must not be null");
         Objects.requireNonNull(protocolVersion, "protocolVersion must not be null");
 	}
-	
-	
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 }

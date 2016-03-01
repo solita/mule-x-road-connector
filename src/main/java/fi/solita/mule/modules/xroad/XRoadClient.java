@@ -1,7 +1,6 @@
 package fi.solita.mule.modules.xroad;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
@@ -17,7 +16,6 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,7 +26,18 @@ import eu.x_road.xsd.identifiers.XRoadServiceIdentifierType;
 
 public class XRoadClient {
 
-	public Object send(Object payload, XRoadHeaders xRoadHeaders,
+    public static class Result {
+        public final Object payload;
+        public final XRoadHeaders headers;
+        
+        
+        public Result(Object payload, XRoadHeaders headers) {
+            this.payload = payload;
+            this.headers = headers;
+        }
+    }
+    
+	public Result send(Object payload, XRoadHeaders xRoadHeaders,
 			String endpointUrl) {
 		try {
 		    xRoadHeaders.validate();
@@ -47,8 +56,9 @@ public class XRoadClient {
 			
 			SOAPMessage response = getDispatch(endpointUrl).invoke(request);
 			
-			//System.err.println(parseHeaders(response.getSOAPHeader()));
-			return response.getSOAPBody().extractContentAsDocument();
+			XRoadHeaders responseHeaders = parseHeaders(response.getSOAPHeader());
+			Result result = new Result(response.getSOAPBody().extractContentAsDocument(), responseHeaders);
+			return result;
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to send message ", e);
 		}
@@ -63,18 +73,29 @@ public class XRoadClient {
 	}
 
     private XRoadHeaders parseHeaders(SOAPHeader soapHeader) throws JAXBException {
-       
-        Node clientNode = single(soapHeader.getElementsByTagNameNS("http://x-road.eu/xsd/xroad.xsd", "client"));
-        System.err.println(soapHeader.getChildNodes().item(0));
-        XRoadClientIdentifierType client = getXRoadContext().createUnmarshaller().unmarshal(clientNode, XRoadClientIdentifierType.class).getValue();
-        System.err.println(ReflectionToStringBuilder.toString(client));
+        XRoadClientIdentifierType client = getXroadHeaderJaxbElement(soapHeader, "client", XRoadClientIdentifierType.class);
+        XRoadServiceIdentifierType service = getXroadHeaderJaxbElement(soapHeader, "service", XRoadServiceIdentifierType.class);
+        String userId = getXroadHeaderJaxbElement(soapHeader, "userId", String.class);
+        String id = getXroadHeaderJaxbElement(soapHeader, "id", String.class);
+        String protocolVersion = getXroadHeaderJaxbElement(soapHeader, "protocolVersion", String.class);
+        // Should requesthash be readed also?
         
-        /*
-        XRoadHeaders result = new XRoadHeaders(soapHeader.getc, clientXroadInstance, clientMemberClass,
-                clientMemberCode, clientSubsystemCode, serviceXroadInstance,
-                serviceMemberClass, serviceMemberCode, serviceSubsystemCode,
-                serviceServiceCode, serviceServiceVersion, userId, protocolVersion);*/
-        return null;
+        XRoadHeaders result = new XRoadHeaders(id, client.getXRoadInstance(), client.getMemberClass(),
+                client.getMemberCode(), client.getSubsystemCode(), service.getXRoadInstance(),
+                service.getMemberClass(), service.getMemberCode(), service.getSubsystemCode(),
+                service.getServiceCode(), service.getServiceVersion(), userId, protocolVersion);
+        return result;
+    }
+
+    private <T> T getXroadHeaderJaxbElement(
+            SOAPHeader soapHeader, String elementName, Class<T> elementClass) throws JAXBException {
+        Node clientNode = getXroadHeaderNode(soapHeader, elementName);
+        System.err.println(clientNode);
+        return getXRoadContext().createUnmarshaller().unmarshal(clientNode, elementClass).getValue();
+    }
+
+    private Node getXroadHeaderNode(SOAPHeader soapHeader, String elementName) {
+        return single(soapHeader.getElementsByTagNameNS("http://x-road.eu/xsd/xroad.xsd", elementName));
     }
 
     private Dispatch<SOAPMessage> getDispatch(String endpointUrl) {

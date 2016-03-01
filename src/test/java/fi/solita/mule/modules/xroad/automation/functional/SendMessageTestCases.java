@@ -5,16 +5,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.HashMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -39,7 +37,7 @@ public class SendMessageTestCases extends AbstractTestCase<XRoadConnector> {
     @Test
     public void testSendMessage() throws Exception {
     	Document doc = getHelloServiceRequest();
-        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, null, null, null, null, /* new HashMap<String, Object>() */ null);
         assertNotNull(result);
         assertTrue(result instanceof Document);
         System.err.println(getStringFromDocument((Document) result));
