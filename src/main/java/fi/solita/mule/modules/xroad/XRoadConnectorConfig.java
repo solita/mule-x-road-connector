@@ -82,6 +82,7 @@ public class XRoadConnectorConfig {
      * X-Road header
      */
     @Configurable
+    @Optional
     public String userId;
     
     /**

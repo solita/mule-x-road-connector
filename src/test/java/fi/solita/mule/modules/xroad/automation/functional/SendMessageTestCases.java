@@ -41,6 +41,15 @@ public class SendMessageTestCases extends AbstractTestCase<XRoadConnector> {
         assertTrue(result instanceof Document);
         System.out.println(getStringFromDocument((Document) result));
     }
+
+    @Test
+    public void testRandomMessage() throws Exception {
+    	Document doc = getRandomServiceRequest();
+        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, "getRandom", null, null, null, null);
+        assertNotNull(result);
+        assertTrue(result instanceof Document);
+        System.out.println(getStringFromDocument((Document) result));
+    }
     
     public Document getHelloServiceRequest() throws Exception {
         
@@ -53,6 +62,15 @@ public class SendMessageTestCases extends AbstractTestCase<XRoadConnector> {
         return getDocumentFromString(content);
     }
 
+    public Document getRandomServiceRequest() throws Exception {
+        
+        String content = "<ns1:getRandom xmlns:ns1=\"http://test.x-road.fi/producer\">\n" +
+                         "  <request/>\n" +
+                         "</ns1:getRandom>";
+
+        return getDocumentFromString(content);
+    }
+    
     private Document getDocumentFromString(String content)
             throws Exception {
         DOMResult result = new DOMResult(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
