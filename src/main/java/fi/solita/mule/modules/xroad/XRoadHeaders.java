@@ -18,6 +18,7 @@ public class XRoadHeaders {
 	public final String serviceSubsystemCode;
 	public final String serviceServiceCode;
 	public final String serviceServiceVersion;
+	public final Boolean async;
 	public final String userId;
 	public final String protocolVersion;
 	
@@ -26,7 +27,7 @@ public class XRoadHeaders {
 			String clientSubsystemCode, String serviceXroadInstance,
 			String serviceMemberClass, String serviceMemberCode,
 			String serviceSubsystemCode, String serviceServiceCode,
-			String serviceServiceVersion, String userId, String protocolVersion) {
+			String serviceServiceVersion, Boolean async, String userId, String protocolVersion) {
 		this.id = id;
 		this.clientXroadInstance = clientXroadInstance;
 		this.clientMemberClass = clientMemberClass;
@@ -38,6 +39,7 @@ public class XRoadHeaders {
 		this.serviceSubsystemCode = serviceSubsystemCode;
 		this.serviceServiceCode = serviceServiceCode;
 		this.serviceServiceVersion = serviceServiceVersion;
+		this.async = async;
 		this.userId = userId;
 		this.protocolVersion = protocolVersion;
 	}
@@ -61,6 +63,7 @@ public class XRoadHeaders {
 		    defaultString(overridedHeaders.serviceSubsystemCode,serviceSubsystemCode),
 		    defaultString(overridedHeaders.serviceServiceCode, serviceServiceCode),
 		    defaultString(overridedHeaders.serviceServiceVersion, serviceServiceVersion),
+		    (overridedHeaders.async != null ? overridedHeaders.async : null),
 		    defaultString(overridedHeaders.userId, userId),
 		    defaultString(overridedHeaders.protocolVersion, protocolVersion));
 		return result;

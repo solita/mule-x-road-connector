@@ -27,6 +27,8 @@ import eu.x_road.xsd.identifiers.XRoadServiceIdentifierType;
 
 public class XRoadClient {
 
+	public static final String XROAD_NAMESPACE = "http://x-road.eu/xsd/xroad.xsd";
+	
     public static class Result {
         public final Object payload;
         public final XRoadHeaders headers;
@@ -77,6 +79,7 @@ public class XRoadClient {
         Unmarshaller unmarshaller = getXRoadContext().createUnmarshaller();
         XRoadClientIdentifierType client = getXroadHeaderJaxbElement(soapHeader, "client", XRoadClientIdentifierType.class, unmarshaller);
         XRoadServiceIdentifierType service = getXroadHeaderJaxbElement(soapHeader, "service", XRoadServiceIdentifierType.class, unmarshaller);
+        Boolean async = findXroadHeaderJaxbElement(soapHeader, "async", Boolean.class, unmarshaller);
         String userId = getXroadHeaderJaxbElement(soapHeader, "userId", String.class, unmarshaller);
         String id = getXroadHeaderJaxbElement(soapHeader, "id", String.class, unmarshaller);
         String protocolVersion = getXroadHeaderJaxbElement(soapHeader, "protocolVersion", String.class, unmarshaller);
@@ -85,7 +88,7 @@ public class XRoadClient {
         XRoadHeaders result = new XRoadHeaders(id, client.getXRoadInstance(), client.getMemberClass(),
                 client.getMemberCode(), client.getSubsystemCode(), service.getXRoadInstance(),
                 service.getMemberClass(), service.getMemberCode(), service.getSubsystemCode(),
-                service.getServiceCode(), service.getServiceVersion(), userId, protocolVersion);
+                service.getServiceCode(), service.getServiceVersion(), async, userId, protocolVersion);
         return result;
     }
 
@@ -95,10 +98,27 @@ public class XRoadClient {
         return unmarshaller.unmarshal(clientNode, elementClass).getValue();
     }
 
-    private Node getXroadHeaderNode(SOAPHeader soapHeader, String elementName) {
-        return single(soapHeader.getElementsByTagNameNS("http://x-road.eu/xsd/xroad.xsd", elementName));
+    private <T> T findXroadHeaderJaxbElement(
+            SOAPHeader soapHeader, String elementName, Class<T> elementClass, Unmarshaller unmarshaller) throws JAXBException {
+        Node clientNode = findXroadHeaderNode(soapHeader, elementName);
+        if (clientNode != null) {
+        	return unmarshaller.unmarshal(clientNode, elementClass).getValue();
+        }
+        return null;
     }
 
+    private Node getXroadHeaderNode(SOAPHeader soapHeader, String elementName) {
+        return single(soapHeader.getElementsByTagNameNS(XROAD_NAMESPACE, elementName));
+    }
+
+    private Node findXroadHeaderNode(SOAPHeader soapHeader, String elementName) {
+    	NodeList list = soapHeader.getElementsByTagNameNS(XROAD_NAMESPACE, elementName);
+    	if (list.getLength() > 0) {
+    		return list.item(0);
+    	}
+        return null;
+    }
+    
     private Dispatch<SOAPMessage> getDispatch(String endpointUrl) {
         QName serviceName = new QName("", "");
         QName portName = new QName("", "");
@@ -146,8 +166,12 @@ public class XRoadClient {
 		final Marshaller marshaller = getXRoadContext().createMarshaller();
 		marshaller.marshal(xroadOf.createClient(client), header);
 		marshaller.marshal(xroadOf.createService(service), header);
+		if (xRoadHeaders.async != null) {
+			marshaller.marshal(xroadOf.createAsync(xRoadHeaders.async), header);
+		}
 		marshaller.marshal(xroadOf.createUserId(xRoadHeaders.userId), header);
 		marshaller.marshal(xroadOf.createId(xRoadHeaders.id), header);
+		
 		marshaller.marshal(xroadOf.createProtocolVersion(xRoadHeaders.protocolVersion), header);
         
 	}

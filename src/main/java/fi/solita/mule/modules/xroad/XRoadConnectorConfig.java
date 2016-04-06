@@ -79,6 +79,13 @@ public class XRoadConnectorConfig {
     public String serviceServiceVersion;
 
     /**
+     * X-Road header. Probably you want to configure this where you use the connector.
+     */
+    @Configurable
+    @Optional
+    public String async;
+
+    /**
      * X-Road header
      */
     @Configurable
@@ -181,6 +188,14 @@ public class XRoadConnectorConfig {
         this.serviceServiceVersion = serviceServiceVersion;
     }
 
+    public String getAsync() {
+    	return async;
+    }
+    
+    public void setAsync(String async) {
+    	this.async = async;
+    }
+    
     public String getUserId() {
         return userId;
     }
@@ -209,7 +224,7 @@ public class XRoadConnectorConfig {
         return new XRoadHeaders(null, clientXroadInstance, clientMemberClass,
                 clientMemberCode, clientSubsystemCode, serviceXroadInstance,
                 serviceMemberClass, serviceMemberCode, serviceSubsystemCode,
-                serviceServiceCode, serviceServiceVersion, userId, protocolVersion);
+                serviceServiceCode, serviceServiceVersion, async != null ? Boolean.parseBoolean(async) : null, userId, protocolVersion);
 
     }
 

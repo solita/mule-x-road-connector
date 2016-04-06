@@ -63,6 +63,7 @@ public class XRoadConnector {
 			@Optional String serviceSubsystemCode,
 			@Optional String serviceServiceCode,
 			@Optional String serviceServiceVersion,
+			@Optional Boolean async,
 			@Optional String userId,
 			@Optional String protocolVersion,
 			//@OutboundHeaders Map<String, Object> outboundHeaders
@@ -72,7 +73,7 @@ public class XRoadConnector {
 	    XRoadHeaders overridedHeaders = new XRoadHeaders(defaultString(id, UUID.getUUID()), clientXroadInstance, clientMemberClass,
                 clientMemberCode, clientSubsystemCode, serviceXroadInstance,
                 serviceMemberClass, serviceMemberCode, serviceSubsystemCode,
-                serviceServiceCode, serviceServiceVersion, userId, protocolVersion);
+                serviceServiceCode, serviceServiceVersion, async, userId, protocolVersion);
 	
 		Result response = config.getClient().send(payload, config.getXRoadHeaders().merge(overridedHeaders), config.getEndpointUrl());
 		

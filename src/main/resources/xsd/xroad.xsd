@@ -34,6 +34,7 @@
                 for this message</xs:documentation>
         </xs:annotation>
     </xs:element>
+    <xs:element name="async" type="xs:boolean" />
     <xs:element name="userId" type="xs:string">
         <xs:annotation>
             <xs:documentation>User whose action initiated

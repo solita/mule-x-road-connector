@@ -36,7 +36,7 @@ public class SendMessageTestCases extends AbstractTestCase<XRoadConnector> {
     @Test
     public void testSendMessage() throws Exception {
     	Document doc = getHelloServiceRequest();
-        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, null, null, Boolean.FALSE, null, null, null);
         assertNotNull(result);
         assertTrue(result instanceof Document);
         System.out.println(getStringFromDocument((Document) result));
@@ -45,7 +45,7 @@ public class SendMessageTestCases extends AbstractTestCase<XRoadConnector> {
     @Test
     public void testRandomMessage() throws Exception {
     	Document doc = getRandomServiceRequest();
-        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, "getRandom", null, null, null, null);
+        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, "getRandom", null, Boolean.TRUE, null, null, null);
         assertNotNull(result);
         assertTrue(result instanceof Document);
         System.out.println(getStringFromDocument((Document) result));
