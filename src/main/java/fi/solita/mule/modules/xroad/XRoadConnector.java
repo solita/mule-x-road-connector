@@ -85,7 +85,9 @@ public class XRoadConnector {
     private void fillOutboundHeaders(MuleMessage muleMessage, XRoadHeaders headers) {
         try {
             for (Field field : headers.getClass().getDeclaredFields()) {
-                muleMessage.setOutboundProperty(X_ROAD_PROPERTY_PREFIX + field.getName(), field.get(headers));
+            	if (!field.isSynthetic()) {
+                   muleMessage.setOutboundProperty(X_ROAD_PROPERTY_PREFIX + field.getName(), field.get(headers));
+            	}
                 
             }
         } catch (Exception e) {
