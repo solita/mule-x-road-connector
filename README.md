@@ -3,22 +3,11 @@
 [Connector description including destination service or application with]
 
 # Mule supported versions
-Examples:
-Mule 3.4.x, 3.5.x
-Mule 3.4.1
+Mule 3.5.x, 3.6.x, 3.7.x
 
-# [Destination service or application name] supported versions
+# [Liityntäpalvelimen / Security Server: X-Road protocol 4.0] supported versions
 Example:
-Oracle E-Business Suite 12.1 and above.
-
-#Service or application supported modules
-Example:
-Oracle CRM
-Oracle Financials
-or 
-Salesforce API v.24
-Salesforce Metadata API
-
+Security Server 6.7.x
 
 # Installation 
 For beta connectors you can download the source code and build it with devkit to find it available on your local repository. Then you can add it to Studio

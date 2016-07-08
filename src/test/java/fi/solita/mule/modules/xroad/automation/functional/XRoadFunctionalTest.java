@@ -1,3 +1,6 @@
+/**
+ * MIT License Copyright (c) 2016 Solita
+ */
 package fi.solita.mule.modules.xroad.automation.functional;
 
 import static org.junit.Assert.assertEquals;
@@ -15,10 +18,21 @@ public class XRoadFunctionalTest extends FunctionalTestCase {
     }
     
     @Test
-    public void sendMessage() throws Exception {
-       MuleEvent result = runFlow("send-message");
-       assertTrue(result.getMessageAsString().contains("Greetings from adapter server!"));
+    public void sendHelloMessage() throws Exception {
+       MuleEvent result = runFlow("send-HelloServiceMessage");
+       String messageAsString = result.getMessageAsString();
+       assertTrue(messageAsString.contains("Greetings from adapter server!"));
        System.err.println(result.getMessage().getOutboundPropertyNames());
-       assertEquals("test", result.getMessage().getOutboundProperty("X-ROAD-userId"));
+       assertEquals("automationTest", result.getMessage().getOutboundProperty("X-ROAD-userId"));
+       logger.info(messageAsString);
+    }
+
+    @Test
+    public void sendGetRandomMessage() throws Exception {
+       MuleEvent result = runFlow("send-GetRandomMessage");
+       String messageAsString = result.getMessageAsString();
+       assertTrue(messageAsString.contains("data>"));
+       assertEquals("FI-DEV", result.getMessage().getOutboundProperty("X-Road-clientXroadInstance"));
+       logger.info(messageAsString);
     }
 }

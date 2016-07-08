@@ -1,30 +1,16 @@
+/**
+ * MIT License Copyright (c) 2016 Solita
+ */
 package fi.solita.mule.modules.xroad.automation.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
 import org.junit.Test;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
-import org.mule.module.xml.util.XMLUtils;
 import org.mule.tools.devkit.ctf.junit.AbstractTestCase;
-import org.mule.transformer.types.SimpleDataType;
 import org.w3c.dom.Document;
 
+import fi.solita.mule.modules.xroad.LipaMockComponent;
 import fi.solita.mule.modules.xroad.XRoadConnector;
 
 public class SendMessageTestCases extends AbstractTestCase<XRoadConnector> {
@@ -39,27 +25,27 @@ public class SendMessageTestCases extends AbstractTestCase<XRoadConnector> {
         Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, null, null, Boolean.FALSE, null, null, null);
         assertNotNull(result);
         assertTrue(result instanceof Document);
-        System.out.println(getStringFromDocument((Document) result));
+        System.out.println(LipaMockComponent.getStringFromDocument((Document) result));
     }
 
     @Test
     public void testRandomMessage() throws Exception {
     	Document doc = getRandomServiceRequest();
-        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, "getRandom", null, Boolean.TRUE, null, null, null);
+        Object result = getConnector().sendMessage(doc, null, null, null, null, null, null, null, null, null, "getRandom", "v1", null, null, null, null);
         assertNotNull(result);
         assertTrue(result instanceof Document);
-        System.out.println(getStringFromDocument((Document) result));
+        System.out.println(LipaMockComponent.getStringFromDocument((Document) result));
     }
     
     public Document getHelloServiceRequest() throws Exception {
         
         String content = "<ns2:helloService xmlns:ns2=\"http://test.x-road.fi/producer\">\n" +
-                         "<request>\n" + 
-                         "<name>FI-DEV/COM/1060155-5/mule@Solita!</name>\n" +
-                         "</request>\n" +
+                         "  <request>\n" + 
+                         "    <name>Solita</name>\n" +
+                         "  </request>\n" +
                          "</ns2:helloService>";
 
-        return getDocumentFromString(content);
+        return LipaMockComponent.getDocumentFromString(content);
     }
 
     public Document getRandomServiceRequest() throws Exception {
@@ -68,37 +54,7 @@ public class SendMessageTestCases extends AbstractTestCase<XRoadConnector> {
                          "  <request/>\n" +
                          "</ns1:getRandom>";
 
-        return getDocumentFromString(content);
+        return LipaMockComponent.getDocumentFromString(content);
     }
-    
-    private Document getDocumentFromString(String content)
-            throws Exception {
-        DOMResult result = new DOMResult(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
-     
-        Transformer transformer = XMLUtils.getTransformer();
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        Source source = new StreamSource(new StringReader(content));
-        transformer.transform(source, result);
-        return (Document) result.getNode();
-    }
-    
-    private String getStringFromDocument(Document document) throws Exception {
-        DOMSource domSource = new DOMSource(document);
-        StringWriter sw = new StringWriter();
-        StreamResult result = new StreamResult(sw);
-        Transformer transformer = XMLUtils.getTransformer();
-        transformer.transform(domSource, result);
-        return sw.toString();
-    }
-
-	private <T> JAXBMarshallerTransformer getJaxbMarshallerTransformer(Object payload, Class<T> returnDataType)
-			throws JAXBException, InitialisationException {
-		JAXBContext context = JAXBContext.newInstance(payload.getClass());
-    	JAXBMarshallerTransformer transformer = new JAXBMarshallerTransformer(context, new SimpleDataType<T>(returnDataType));
-   
-    	transformer.initialise();
-		return transformer;
-	}
-
 
 }

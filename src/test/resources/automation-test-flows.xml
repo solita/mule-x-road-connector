@@ -1,27 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<mule xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:x-road="http://www.mulesoft.org/schema/mule/x-road" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:x-road="http://www.mulesoft.org/schema/mule/x-road" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:context="http://www.springframework.org/schema/context"
-
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 http://www.mulesoft.org/schema/mule/x-road http://www.mulesoft.org/schema/mule/x-road/current/mule-x-road.xsd
-http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd"
->
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-<context:property-placeholder location="automation-credentials.properties" />
-    <x-road:x-road name="X_Road__Configuration" clientMemberClass="COM" clientMemberCode="1060155-5" clientSubsystemCode="mule" clientXroadInstance="FI-DEV" endpointUrl="http://solilipa01.solita.fi/" serviceMemberClass="GOV" serviceMemberCode="0245437-2" serviceSubsystemCode="TestService" serviceXroadInstance="FI-DEV" userId="test" doc:name="X-Road: Configuration"/>
- 
-	<flow name="send-message" >
-	        <set-payload value="#['&lt;ns2:helloService xmlns:ns2=&quot;http://test.x-road.fi/producer&quot;&gt;&lt;request&gt;&lt;name&gt;FI-DEV/COM/1060155-5/mule@Solita!&lt;/name&gt;&lt;/request&gt;&lt;/ns2:helloService&gt;']" doc:name="Set helloService payload"/>
-	        <mulexml:xml-to-dom-transformer doc:name="XML to DOM" returnClass="org.w3c.dom.Document"/>
-	    
-	        <x-road:send-message config-ref="X_Road__Configuration" doc:name="X-Road" serviceServiceCode="helloService" serviceServiceVersion="v1"/>
-	       
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="9090" doc:name="HTTP Listener Configuration"/>
+
+    <context:property-placeholder location="automation-credentials.properties" />
+
+    <x-road:x-road name="X_Road__Configuration" endpointUrl="${x-road.endpointUrl}"
+        clientXroadInstance="${x-road.clientXroadInstance}" clientMemberClass="${x-road.clientMemberClass}" clientMemberCode="${x-road.clientMemberCode}" clientSubsystemCode="${x-road.clientSubsystemCode}"
+        serviceXroadInstance="${x-road.serviceXroadInstance}" serviceMemberClass="${x-road.serviceMemberClass}" serviceMemberCode="${x-road.serviceMemberCode}" serviceSubsystemCode="${x-road.serviceSubsystemCode}" userId="automationTest" doc:name="X-Road: Configuration"/>
+    
+
+	<flow name="send-HelloServiceMessage" >
+	    <set-payload value="#['&lt;ns2:helloService xmlns:ns2=&quot;http://test.x-road.fi/producer&quot;&gt;&lt;request&gt;&lt;name&gt;Solita&lt;/name&gt;&lt;/request&gt;&lt;/ns2:helloService&gt;']" doc:name="Set helloService payload"/>
+	    <mulexml:xml-to-dom-transformer doc:name="XML to DOM" returnClass="org.w3c.dom.Document"/>
+	    <x-road:send-message config-ref="X_Road__Configuration" doc:name="X-Road" serviceServiceCode="helloService" serviceServiceVersion="v1"/>
     </flow>
 
+	<flow name="send-GetRandomMessage" >
+	    <set-payload value="#['&lt;ns2:getRandom xmlns:ns2=&quot;http://test.x-road.fi/producer&quot;&gt;&lt;request/&gt;&lt;/ns2:getRandom&gt;']" doc:name="Set getRandom payload"/>
+	    <mulexml:xml-to-dom-transformer doc:name="XML to DOM" returnClass="org.w3c.dom.Document"/>
+	    <x-road:send-message config-ref="X_Road__Configuration" doc:name="X-Road" serviceServiceCode="getRandom" serviceServiceVersion="v1"/>
+    </flow>
+
+    <flow name="lipa-mock">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
+
+        <component>
+            <prototype-object class="fi.solita.mule.modules.xroad.LipaMockComponent" />
+        </component>
+        <set-payload value="#[payload]" />
+        <object-to-byte-array-transformer mimeType="text/xml" encoding="UTF-8" />
+        <set-property propertyName="Content-Type" value="text/xml" />
+        <set-property propertyName="http.status" value="200" />
+
+        <catch-exception-strategy>
+            <set-property propertyName="http.status" value="500" />
+            <set-payload value="Call failed (exception : #[exception.getMessage()]" />
+        </catch-exception-strategy>
+    </flow>
+ 
 
 </mule>

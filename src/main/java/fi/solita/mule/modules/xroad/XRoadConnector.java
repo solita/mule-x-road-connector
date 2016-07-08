@@ -1,3 +1,6 @@
+/**
+ * MIT License Copyright (c) 2016 Solita
+ */
 package fi.solita.mule.modules.xroad;
 
 import static org.apache.commons.lang.StringUtils.defaultString;
@@ -19,9 +22,9 @@ import fi.solita.mule.modules.xroad.XRoadClient.Result;
  * Connector implements 
  * {@see <a href="http://esuomi.fi/?mdocs-file=2268&mdocs-url=false">X-Road protocol for adapter server messaging v4.0</a>}
  * used in X-Road 6.0.
- *
+ * @author Ari Ruotsalainen, Solita
  */
-@Connector(name = "x-road", description = "X-Road Connector", friendlyName = "X-Road")
+@Connector(name = "x-road", description = "X-Road Connector", friendlyName = "X-Road", minMuleVersion= "3.5")
 public class XRoadConnector {
 
 	public static final String X_ROAD_PROPERTY_PREFIX = "X-Road-";
@@ -46,6 +49,7 @@ public class XRoadConnector {
      * @param serviceSubsystemCode X-Road header
      * @param serviceServiceCode X-Road header
      * @param serviceServiceVersion X-Road header
+     * @param async X-Road header
      * @param userId X-Road header
      * @param protocolVersion X-Road header
 	 * @return returns reponse message. Following x-road headers are set to outbound properties: X-Road-clientMemberClass, X-Road-serviceXroadInstance, X-Road-userId, X-Road-clientSubsystemCode, X-Road-serviceSubsystemCode, X-Road-id, X-Road-clientMemberCode, X-Road-serviceMemberCode, X-Road-serviceServiceCode, X-Road-protocolVersion, X-Road-serviceMemberClass, X-Road-serviceServiceVersion, X-Road-clientXroadInstance 

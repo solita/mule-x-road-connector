@@ -1,3 +1,6 @@
+/**
+ * MIT License Copyright (c) 2016 Solita
+ */
 package fi.solita.mule.modules.xroad;
 
 import javax.xml.bind.JAXBContext;
@@ -28,6 +31,7 @@ import eu.x_road.xsd.identifiers.XRoadServiceIdentifierType;
 public class XRoadClient {
 
 	public static final String XROAD_NAMESPACE = "http://x-road.eu/xsd/xroad.xsd";
+	private static final String X_ROAD_CONTEXT_PATH = "eu.x_road.xsd.xroad";
 	
     public static class Result {
         public final Object payload;
@@ -177,8 +181,7 @@ public class XRoadClient {
 	}
 
     private JAXBContext getXRoadContext() throws JAXBException {
-        JAXBContext xRoadContext = JAXBContext
-				.newInstance("eu.x_road.xsd.xroad");
+        JAXBContext xRoadContext = JAXBContext.newInstance(X_ROAD_CONTEXT_PATH);
         return xRoadContext;
     }
 }

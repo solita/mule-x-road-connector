@@ -1,3 +1,6 @@
+/**
+ * MIT License Copyright (c) 2016 Solita
+ */
 package fi.solita.mule.modules.xroad.automation.runner;
 
 import org.junit.AfterClass;
