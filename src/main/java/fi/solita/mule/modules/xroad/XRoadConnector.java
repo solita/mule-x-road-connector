@@ -1,5 +1,5 @@
 /**
- * MIT License Copyright (c) 2016 Solita
+ * MIT License Copyright (c) 2016 Solita Oy
  */
 package fi.solita.mule.modules.xroad;
 
@@ -22,7 +22,7 @@ import fi.solita.mule.modules.xroad.XRoadClient.Result;
  * Connector implements 
  * {@see <a href="http://esuomi.fi/?mdocs-file=2268&mdocs-url=false">X-Road protocol for adapter server messaging v4.0</a>}
  * used in X-Road 6.0.
- * @author Ari Ruotsalainen, Solita
+ * @author Ari Ruotsalainen, Solita Oy
  */
 @Connector(name = "x-road", description = "X-Road Connector", friendlyName = "X-Road", minMuleVersion= "3.5")
 public class XRoadConnector {
@@ -34,13 +34,13 @@ public class XRoadConnector {
 	
 
 	/**
-	 * Custom processor that sends xroad message. Optional values are taken from connector but can be
-	 * overridden.
-	 * 
-	 * @param payload JAXB payload or {@link org.w3c.dom.Document}, which is sent
-	 * @param id X-Road header
-	 * @param clientXroadInstance X-Road header
-	 * @param clientMemberClass X-Road header
+     * Custom processor that sends xroad message. Optional values are taken from connector but can be
+     * overridden.
+     * 
+     * @param payload JAXB payload or {@link org.w3c.dom.Document}, which is sent
+     * @param id X-Road header
+     * @param clientXroadInstance X-Road header
+     * @param clientMemberClass X-Road header
      * @param clientMemberCode X-Road header
      * @param clientSubsystemCode X-Road header
      * @param serviceXroadInstance X-Road header
@@ -52,8 +52,10 @@ public class XRoadConnector {
      * @param async X-Road header
      * @param userId X-Road header
      * @param protocolVersion X-Road header
-	 * @return returns reponse message. Following x-road headers are set to outbound properties: X-Road-clientMemberClass, X-Road-serviceXroadInstance, X-Road-userId, X-Road-clientSubsystemCode, X-Road-serviceSubsystemCode, X-Road-id, X-Road-clientMemberCode, X-Road-serviceMemberCode, X-Road-serviceServiceCode, X-Road-protocolVersion, X-Road-serviceMemberClass, X-Road-serviceServiceVersion, X-Road-clientXroadInstance 
-	 */
+     * @return returns reponse message. Following x-road headers are set to outbound properties: 
+     *     X-Road-clientMemberClass, X-Road-serviceXroadInstance, X-Road-userId, X-Road-clientSubsystemCode, X-Road-serviceSubsystemCode, X-Road-id,
+     *     X-Road-clientMemberCode, X-Road-serviceMemberCode, X-Road-serviceServiceCode, X-Road-protocolVersion, X-Road-serviceMemberClass, X-Road-serviceServiceVersion, X-Road-clientXroadInstance 
+     */
 	@Processor
 	public Object sendMessage(@Default("#[payload]") Object payload,
 			@Optional String id,

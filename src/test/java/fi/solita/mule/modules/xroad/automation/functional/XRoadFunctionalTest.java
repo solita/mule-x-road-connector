@@ -1,5 +1,5 @@
 /**
- * MIT License Copyright (c) 2016 Solita
+ * MIT License Copyright (c) 2016 Solita Oy
  */
 package fi.solita.mule.modules.xroad.automation.functional;
 
