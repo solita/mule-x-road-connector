@@ -43,7 +43,9 @@ public class XRoadClient {
             this.headers = headers;
         }
     }
-    
+
+    private JAXBContext xRoadContext = null;
+
 	public Result send(Object payload, XRoadHeaders xRoadHeaders,
 			String endpointUrl) {
 		try {
@@ -117,7 +119,7 @@ public class XRoadClient {
 
     private Node findXroadHeaderNode(SOAPHeader soapHeader, String elementName) {
     	NodeList list = soapHeader.getElementsByTagNameNS(XROAD_NAMESPACE, elementName);
-    	if (list.getLength() > 0) {
+    	if (list != null && list.getLength() > 0) {
     		return list.item(0);
     	}
         return null;
@@ -181,7 +183,9 @@ public class XRoadClient {
 	}
 
     private JAXBContext getXRoadContext() throws JAXBException {
-        JAXBContext xRoadContext = JAXBContext.newInstance(X_ROAD_CONTEXT_PATH);
+    	if (xRoadContext == null) {
+    		xRoadContext = JAXBContext.newInstance(X_ROAD_CONTEXT_PATH);	
+    	}
         return xRoadContext;
     }
 }

@@ -27,13 +27,13 @@ import fi.solita.mule.modules.xroad.XRoadClient.Result;
 @Connector(name = "x-road", description = "X-Road Connector", friendlyName = "X-Road", minMuleVersion= "3.5")
 public class XRoadConnector {
 
-	public static final String X_ROAD_PROPERTY_PREFIX = "X-Road-";
+    public static final String X_ROAD_PROPERTY_PREFIX = "X-Road-";
 	
     @Config
-	private XRoadConnectorConfig config;
-	
+    private XRoadConnectorConfig config;
 
-	/**
+
+    /**
      * Custom processor that sends xroad message. Optional values are taken from connector but can be
      * overridden.
      * 
@@ -101,12 +101,12 @@ public class XRoadConnector {
         }
     }
 
-	public XRoadConnectorConfig getConfig() {
-		return config;
-	}
+    public XRoadConnectorConfig getConfig() {
+        return config;
+    }
 
 
-	public void setConfig(XRoadConnectorConfig config) {
-		this.config = config;
-	}
+    public void setConfig(XRoadConnectorConfig config) {
+        this.config = config;
+    }
 }
