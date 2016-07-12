@@ -30,14 +30,13 @@ import eu.x_road.xsd.identifiers.XRoadServiceIdentifierType;
 
 public class XRoadClient {
 
-	public static final String XROAD_NAMESPACE = "http://x-road.eu/xsd/xroad.xsd";
-	private static final String X_ROAD_CONTEXT_PATH = "eu.x_road.xsd.xroad";
-	
+    public static final String XROAD_NAMESPACE = "http://x-road.eu/xsd/xroad.xsd";
+    private static final String X_ROAD_CONTEXT_PATH = "eu.x_road.xsd.xroad";
+
     public static class Result {
         public final Object payload;
         public final XRoadHeaders headers;
-        
-        
+
         public Result(Object payload, XRoadHeaders headers) {
             this.payload = payload;
             this.headers = headers;
@@ -46,69 +45,73 @@ public class XRoadClient {
 
     private JAXBContext xRoadContext = null;
 
-	public Result send(Object payload, XRoadHeaders xRoadHeaders,
-			String endpointUrl) {
-		try {
-		    xRoadHeaders.validate();
-			MessageFactory mf = MessageFactory
-					.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
+    public Result send(Object payload, XRoadHeaders xRoadHeaders, String endpointUrl) {
+        try {
+            xRoadHeaders.validate();
+            MessageFactory mf = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
 
-			SOAPMessage request = mf.createMessage();
-			SOAPPart part = request.getSOAPPart();
-			SOAPEnvelope env = part.getEnvelope();
+            SOAPMessage request = mf.createMessage();
+            SOAPPart part = request.getSOAPPart();
+            SOAPEnvelope env = part.getEnvelope();
 
-			buildBody(payload, env.getBody());
+            buildBody(payload, env.getBody());
+            buildHeader(xRoadHeaders, env.getHeader());
 
-			buildHeader(xRoadHeaders, env.getHeader());
+            request.saveChanges();
 
-			request.saveChanges();
-			
-			SOAPMessage response = getDispatch(endpointUrl).invoke(request);
-			
-			XRoadHeaders responseHeaders = parseHeaders(response.getSOAPHeader());
-			Result result = new Result(response.getSOAPBody().extractContentAsDocument(), responseHeaders);
-			return result;
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to send message ", e);
-		}
-	}
-	
-	private Node single(NodeList nodeList) {
-	    if (nodeList.getLength() != 1) {
-	        throw new IllegalArgumentException("Assumed exactly one element in " + nodeList + " but was " + nodeList.getLength());
-	    }
-	        
-	    return nodeList.item(0);
-	}
+            SOAPMessage response = getDispatch(endpointUrl).invoke(request);
+
+            XRoadHeaders responseHeaders = parseHeaders(response.getSOAPHeader());
+            Result result = new Result(response.getSOAPBody().extractContentAsDocument(),
+                    responseHeaders);
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send message ", e);
+        }
+    }
+
+    private Node single(NodeList nodeList) {
+        if (nodeList.getLength() != 1) {
+            throw new IllegalArgumentException("Assumed exactly one element in " + nodeList
+                    + " but was " + nodeList.getLength());
+        }
+
+        return nodeList.item(0);
+    }
 
     private XRoadHeaders parseHeaders(SOAPHeader soapHeader) throws JAXBException {
         Unmarshaller unmarshaller = getXRoadContext().createUnmarshaller();
-        XRoadClientIdentifierType client = getXroadHeaderJaxbElement(soapHeader, "client", XRoadClientIdentifierType.class, unmarshaller);
-        XRoadServiceIdentifierType service = getXroadHeaderJaxbElement(soapHeader, "service", XRoadServiceIdentifierType.class, unmarshaller);
+        XRoadClientIdentifierType client = getXroadHeaderJaxbElement(soapHeader, "client",
+                XRoadClientIdentifierType.class, unmarshaller);
+        XRoadServiceIdentifierType service = getXroadHeaderJaxbElement(soapHeader, "service",
+                XRoadServiceIdentifierType.class, unmarshaller);
         Boolean async = findXroadHeaderJaxbElement(soapHeader, "async", Boolean.class, unmarshaller);
         String userId = getXroadHeaderJaxbElement(soapHeader, "userId", String.class, unmarshaller);
         String id = getXroadHeaderJaxbElement(soapHeader, "id", String.class, unmarshaller);
-        String protocolVersion = getXroadHeaderJaxbElement(soapHeader, "protocolVersion", String.class, unmarshaller);
-        // Should requesthash be readed also?
-        
-        XRoadHeaders result = new XRoadHeaders(id, client.getXRoadInstance(), client.getMemberClass(),
-                client.getMemberCode(), client.getSubsystemCode(), service.getXRoadInstance(),
-                service.getMemberClass(), service.getMemberCode(), service.getSubsystemCode(),
-                service.getServiceCode(), service.getServiceVersion(), async, userId, protocolVersion);
+        String protocolVersion = getXroadHeaderJaxbElement(soapHeader, "protocolVersion",
+                String.class, unmarshaller);
+        // Should requesthash be read also?
+
+        XRoadHeaders result = new XRoadHeaders(id, client.getXRoadInstance(),
+                client.getMemberClass(), client.getMemberCode(), client.getSubsystemCode(),
+                service.getXRoadInstance(), service.getMemberClass(), service.getMemberCode(),
+                service.getSubsystemCode(), service.getServiceCode(), service.getServiceVersion(),
+                async, userId, protocolVersion);
         return result;
     }
 
-    private <T> T getXroadHeaderJaxbElement(
-            SOAPHeader soapHeader, String elementName, Class<T> elementClass, Unmarshaller unmarshaller) throws JAXBException {
+    private <T> T getXroadHeaderJaxbElement(SOAPHeader soapHeader, String elementName,
+            Class<T> elementClass, Unmarshaller unmarshaller) throws JAXBException {
         Node clientNode = getXroadHeaderNode(soapHeader, elementName);
         return unmarshaller.unmarshal(clientNode, elementClass).getValue();
     }
 
-    private <T> T findXroadHeaderJaxbElement(
-            SOAPHeader soapHeader, String elementName, Class<T> elementClass, Unmarshaller unmarshaller) throws JAXBException {
+    private <T> T findXroadHeaderJaxbElement(SOAPHeader soapHeader, String elementName,
+            Class<T> elementClass, Unmarshaller unmarshaller) throws JAXBException {
+        // TODO: Why not use getXroadHeaderNode??
         Node clientNode = findXroadHeaderNode(soapHeader, elementName);
         if (clientNode != null) {
-        	return unmarshaller.unmarshal(clientNode, elementClass).getValue();
+            return unmarshaller.unmarshal(clientNode, elementClass).getValue();
         }
         return null;
     }
@@ -118,74 +121,74 @@ public class XRoadClient {
     }
 
     private Node findXroadHeaderNode(SOAPHeader soapHeader, String elementName) {
-    	NodeList list = soapHeader.getElementsByTagNameNS(XROAD_NAMESPACE, elementName);
-    	if (list != null && list.getLength() > 0) {
-    		return list.item(0);
-    	}
+        NodeList list = soapHeader.getElementsByTagNameNS(XROAD_NAMESPACE, elementName);
+        if (list.getLength() > 0) {
+            // TODO: Ugly to get first and ignore rest
+            return list.item(0);
+        }
         return null;
     }
-    
+
     private Dispatch<SOAPMessage> getDispatch(String endpointUrl) {
         QName serviceName = new QName("", "");
         QName portName = new QName("", "");
         Service service = Service.create(serviceName);
 
-        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING,
-        		endpointUrl);
-        Dispatch<SOAPMessage> dispatch = service.createDispatch(portName,
-        		SOAPMessage.class, Service.Mode.MESSAGE);
+        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, endpointUrl);
+        Dispatch<SOAPMessage> dispatch = service.createDispatch(portName, SOAPMessage.class,
+                Service.Mode.MESSAGE);
         return dispatch;
     }
 
-	private void buildBody(Object payload, SOAPBody body) throws JAXBException,
-			SOAPException {
-		if (payload instanceof Document) {
-			Document document = (Document) payload;
-			body.addDocument(document);
-		} else {
-			JAXBContext context = JAXBContext.newInstance(payload.getClass());
-			final Marshaller marshaller = context.createMarshaller();
-			marshaller.marshal(payload, body);
-		}
-	}
+    private void buildBody(Object payload, SOAPBody body) throws JAXBException, SOAPException {
+        if (payload instanceof Document) {
+            Document document = (Document) payload;
+            body.addDocument(document);
+        } else {
+            // We might cache those contexts if performance is needed...
+            JAXBContext context = JAXBContext.newInstance(payload.getClass());
+            final Marshaller marshaller = context.createMarshaller();
+            marshaller.marshal(payload, body);
+        }
+    }
 
-	private void buildHeader(XRoadHeaders xRoadHeaders, SOAPHeader header)
-			throws SOAPException, JAXBException {
-		XRoadClientIdentifierType client = new XRoadClientIdentifierType();
-		client.setObjectType(XRoadObjectType.SUBSYSTEM);
-		client.setXRoadInstance(xRoadHeaders.clientXroadInstance);
-		client.setMemberClass(xRoadHeaders.clientMemberClass);
+    private void buildHeader(XRoadHeaders xRoadHeaders, SOAPHeader header) throws SOAPException,
+            JAXBException {
+        XRoadClientIdentifierType client = new XRoadClientIdentifierType();
+        client.setObjectType(XRoadObjectType.SUBSYSTEM);
+        client.setXRoadInstance(xRoadHeaders.clientXroadInstance);
+        client.setMemberClass(xRoadHeaders.clientMemberClass);
 
-		client.setMemberCode(xRoadHeaders.clientMemberCode);
-		client.setSubsystemCode(xRoadHeaders.clientSubsystemCode);
+        client.setMemberCode(xRoadHeaders.clientMemberCode);
+        client.setSubsystemCode(xRoadHeaders.clientSubsystemCode);
 
-		XRoadServiceIdentifierType service = new XRoadServiceIdentifierType();
-		service.setObjectType(XRoadObjectType.SERVICE);
-		service.setXRoadInstance(xRoadHeaders.serviceXroadInstance);
-		service.setMemberClass(xRoadHeaders.serviceMemberClass);
-		service.setMemberCode(xRoadHeaders.serviceMemberCode);
-		service.setSubsystemCode(xRoadHeaders.serviceSubsystemCode);
-		service.setServiceCode(xRoadHeaders.serviceServiceCode);
-		service.setServiceVersion(xRoadHeaders.serviceServiceVersion);
+        XRoadServiceIdentifierType service = new XRoadServiceIdentifierType();
+        service.setObjectType(XRoadObjectType.SERVICE);
+        service.setXRoadInstance(xRoadHeaders.serviceXroadInstance);
+        service.setMemberClass(xRoadHeaders.serviceMemberClass);
+        service.setMemberCode(xRoadHeaders.serviceMemberCode);
+        service.setSubsystemCode(xRoadHeaders.serviceSubsystemCode);
+        service.setServiceCode(xRoadHeaders.serviceServiceCode);
+        service.setServiceVersion(xRoadHeaders.serviceServiceVersion);
 
-		eu.x_road.xsd.xroad.ObjectFactory xroadOf = new eu.x_road.xsd.xroad.ObjectFactory();
-		final Marshaller marshaller = getXRoadContext().createMarshaller();
-		marshaller.marshal(xroadOf.createClient(client), header);
-		marshaller.marshal(xroadOf.createService(service), header);
-		if (xRoadHeaders.async != null) {
-			marshaller.marshal(xroadOf.createAsync(xRoadHeaders.async), header);
-		}
-		marshaller.marshal(xroadOf.createUserId(xRoadHeaders.userId), header);
-		marshaller.marshal(xroadOf.createId(xRoadHeaders.id), header);
-		
-		marshaller.marshal(xroadOf.createProtocolVersion(xRoadHeaders.protocolVersion), header);
-        
-	}
+        eu.x_road.xsd.xroad.ObjectFactory xroadOf = new eu.x_road.xsd.xroad.ObjectFactory();
+        final Marshaller marshaller = getXRoadContext().createMarshaller();
+        marshaller.marshal(xroadOf.createClient(client), header);
+        marshaller.marshal(xroadOf.createService(service), header);
+        if (xRoadHeaders.async != null) {
+            marshaller.marshal(xroadOf.createAsync(xRoadHeaders.async), header);
+        }
+        marshaller.marshal(xroadOf.createUserId(xRoadHeaders.userId), header);
+        marshaller.marshal(xroadOf.createId(xRoadHeaders.id), header);
 
-    private JAXBContext getXRoadContext() throws JAXBException {
-    	if (xRoadContext == null) {
-    		xRoadContext = JAXBContext.newInstance(X_ROAD_CONTEXT_PATH);	
-    	}
+        marshaller.marshal(xroadOf.createProtocolVersion(xRoadHeaders.protocolVersion), header);
+
+    }
+
+    private synchronized JAXBContext getXRoadContext() throws JAXBException {
+        if (xRoadContext == null) {
+            xRoadContext = JAXBContext.newInstance(X_ROAD_CONTEXT_PATH);
+        }
         return xRoadContext;
     }
 }

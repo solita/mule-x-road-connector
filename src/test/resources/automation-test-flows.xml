@@ -33,7 +33,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 
     <flow name="lipa-mock">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
-
+        <!-- TODO: Why this is prototypeobject? -->
         <component>
             <prototype-object class="fi.solita.mule.modules.xroad.LipaMockComponent" />
         </component>

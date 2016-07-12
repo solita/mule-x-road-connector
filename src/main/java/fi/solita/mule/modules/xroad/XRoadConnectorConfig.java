@@ -68,24 +68,28 @@ public class XRoadConnectorConfig {
     public String serviceSubsystemCode;
 
     /**
-     * X-Road header. Probably you want to configure this where you use the connector.
+     * X-Road header. Probably you want to configure this where you use the
+     * connector.
      */
     @Configurable
     @Optional
     public String serviceServiceCode;
 
     /**
-     * X-Road header. Probably you want to configure this where you use the connector.
+     * X-Road header. Probably you want to configure this where you use the
+     * connector.
      */
     @Configurable
     @Optional
     public String serviceServiceVersion;
 
     /**
-     * X-Road header. Probably you want to configure this where you use the connector.
+     * X-Road header. Probably you want to configure this where you use the
+     * connector. You may leave this null.
      */
     @Configurable
     @Optional
+    // Devkit won't allow Boolean to be null so we use String here
     public String async;
 
     /**
@@ -94,7 +98,7 @@ public class XRoadConnectorConfig {
     @Configurable
     @Optional
     public String userId;
-    
+
     /**
      * X-Road header
      */
@@ -191,14 +195,15 @@ public class XRoadConnectorConfig {
         this.serviceServiceVersion = serviceServiceVersion;
     }
 
+   
     public String getAsync() {
-    	return async;
+        return async;
     }
-    
+
     public void setAsync(String async) {
-    	this.async = async;
+        this.async = async;
     }
-    
+
     public String getUserId() {
         return userId;
     }
@@ -224,10 +229,10 @@ public class XRoadConnectorConfig {
     }
 
     public XRoadHeaders getXRoadHeaders() {
-        return new XRoadHeaders(null, clientXroadInstance, clientMemberClass,
-                clientMemberCode, clientSubsystemCode, serviceXroadInstance,
-                serviceMemberClass, serviceMemberCode, serviceSubsystemCode,
-                serviceServiceCode, serviceServiceVersion, async != null ? Boolean.parseBoolean(async) : null, userId, protocolVersion);
+        return new XRoadHeaders(null, clientXroadInstance, clientMemberClass, clientMemberCode,
+                clientSubsystemCode, serviceXroadInstance, serviceMemberClass, serviceMemberCode,
+                serviceSubsystemCode, serviceServiceCode, serviceServiceVersion,
+                async == null ? null : Boolean.valueOf(async), userId, protocolVersion);
 
     }
 

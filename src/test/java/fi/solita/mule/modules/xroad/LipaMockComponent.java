@@ -28,63 +28,61 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-
 public class LipaMockComponent implements Callable {
 
-	private static final String DEFAULT_ENCODING = "UTF-8";
-	
-	@Override
-	public Object onCall(MuleEventContext eventContext) throws Exception {
-		MuleMessage msg = eventContext.getMessage();		
-		return handleResponse(msg);
-	}
+    private static final String DEFAULT_ENCODING = "UTF-8";
+
+    @Override
+    public Object onCall(MuleEventContext eventContext) throws Exception {
+        MuleMessage msg = eventContext.getMessage();
+        return handleResponse(msg);
+    }
 
     private MuleMessage handleResponse(MuleMessage message) throws Exception {
-        Object payloadObject = message.getPayload();        
+        Object payloadObject = message.getPayload();
         try (InputStream bis = (InputStream) payloadObject) {
-            byte[] bData = IOUtils.readBytesFromStream(bis);            
+            byte[] bData = IOUtils.readBytesFromStream(bis);
 
-            Document requestDocument = getDocumentFromString(new String(bData, DEFAULT_ENCODING));            
+            Document requestDocument = getDocumentFromString(new String(bData, DEFAULT_ENCODING));
             Node serviceNode = findNodeFromDocument(requestDocument, "helloService");
             if (serviceNode == null) {
-            	serviceNode = findNodeFromDocument(requestDocument, "getRandom");
+                serviceNode = findNodeFromDocument(requestDocument, "getRandom");
             }
-            serviceNode.appendChild(createResponseNode(requestDocument, serviceNode));            
-            String response = getStringFromDocument(requestDocument);            
+            serviceNode.appendChild(createResponseNode(requestDocument, serviceNode));
+            String response = getStringFromDocument(requestDocument);
             message.setPayload(response);
             return message;
-        } catch (Exception e) {
-            throw e;
         }
     }
-    
+
     private Node createResponseNode(Document doc, Node serviceNode) {
         Element response = doc.createElement("response");
         Element message = null;
         String operation = serviceNode.getNodeName();
         if (operation.contains("helloService")) {
-        	message = doc.createElement("message");
-        	String callerName = serviceNode.getFirstChild().getFirstChild().getTextContent();
-        	message.setTextContent("Hello: " + callerName + "!! Greetings from adapter server!");
+            message = doc.createElement("message");
+            String callerName = serviceNode.getFirstChild().getFirstChild().getTextContent();
+            message.setTextContent("Hello: " + callerName + "!! Greetings from adapter server!");
         } else if (operation.contains("getRandom")) {
-        	message = doc.createElement("data");
-        	message.setTextContent(Integer.toString(new Random(Runtime.getRuntime().freeMemory()).nextInt()));
+            message = doc.createElement("data");
+            message.setTextContent(Integer.toString(new Random(Runtime.getRuntime().freeMemory())
+                    .nextInt()));
         }
         response.appendChild(message);
         return response;
     }
 
-    public static Document getDocumentFromString(String content)
-            throws Exception {
-        DOMResult result = new DOMResult(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
-     
+    public static Document getDocumentFromString(String content) throws Exception {
+        DOMResult result = new DOMResult(DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                .newDocument());
+
         Transformer transformer = XMLUtils.getTransformer();
         transformer.setOutputProperty(OutputKeys.ENCODING, DEFAULT_ENCODING);
         Source source = new StreamSource(new StringReader(content));
         transformer.transform(source, result);
         return (Document) result.getNode();
     }
-    
+
     public static String getStringFromDocument(Document document) throws Exception {
         DOMSource domSource = new DOMSource(document);
         StringWriter sw = new StringWriter();
@@ -93,7 +91,7 @@ public class LipaMockComponent implements Callable {
         transformer.transform(domSource, result);
         return sw.toString();
     }
-   
+
     public static Node findNodeFromDocument(Document doc, String expectedElementName) {
         Element rootElement = doc.getDocumentElement();
         NodeList nodeList = rootElement.getChildNodes();
@@ -128,7 +126,8 @@ public class LipaMockComponent implements Callable {
                     continue;
                 }
                 for (int j = 0; j < childChildren.getLength(); j++) {
-                    Node responseChild = findNodeFromChildren(childChildren.item(j), expectedElementName);
+                    Node responseChild = findNodeFromChildren(childChildren.item(j),
+                            expectedElementName);
                     if (responseChild != null) {
                         return responseChild;
                     }
