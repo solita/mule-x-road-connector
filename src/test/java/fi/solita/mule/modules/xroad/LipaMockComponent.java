@@ -35,14 +35,29 @@ public class LipaMockComponent implements Callable {
         return handleResponse(msg);
     }
 
+    /**
+     * Echoes the request back with the service specific response element.
+     * E.g. 
+     * <soap:Envelope>
+     *   <soap:Header/>
+     *   <soap:Body>
+     *     <service>
+     *       <request/>
+     *       <response/> <!-- Method adds this element -->
+     *     </service>
+     *   </soap:body>
+     * </soap:Envelope>
+     * @param message Inbound MuleMessage
+     * @return Outbound MuleMessage
+     * @throws Exception
+     */
     private MuleMessage handleResponse(MuleMessage message) throws Exception {
-        Document requestDocument = getDocumentFromString(message.getPayloadAsString(DEFAULT_ENCODING));
+        String reqPayload = message.getPayloadAsString(DEFAULT_ENCODING);
+        Document requestDocument = getDocumentFromString(reqPayload);
         Node bodyNode = findNodeFromDocument(requestDocument, "Body");
         Node serviceNode = bodyNode.getChildNodes().item(0);
-        
-        // TODO: Tapio ei tämä synnytä oikean näköistä SOAP-responsea. Mikä tässä on ideana?
-        // Vastaukseksi tulee tyyliin <?xml version="1.0" encoding="UTF-8"?><ns2:getRandom xmlns:ns2="http://test.x-road.fi/producer"><request/><response><data>-549849087</data></response></ns2:getRandom>
-        serviceNode.appendChild(createResponseNode(requestDocument, serviceNode));
+        Node responseNode = createResponseNode(requestDocument, serviceNode);
+        serviceNode.appendChild(responseNode);
         String response = getStringFromDocument(requestDocument);
         message.setPayload(response);
         return message;

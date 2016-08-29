@@ -108,25 +108,19 @@ public class XRoadClient {
 
     private <T> T findXroadHeaderJaxbElement(SOAPHeader soapHeader, String elementName,
             Class<T> elementClass, Unmarshaller unmarshaller) throws JAXBException {
-        // TODO: Why not use getXroadHeaderNode??
-        Node clientNode = findXroadHeaderNode(soapHeader, elementName);
-        if (clientNode != null) {
-            return unmarshaller.unmarshal(clientNode, elementClass).getValue();
+    	try {
+            Node clientNode = getXroadHeaderNode(soapHeader, elementName);
+            if (clientNode != null) {
+                return unmarshaller.unmarshal(clientNode, elementClass).getValue();
+            }
+    	} catch (IllegalArgumentException iae) {
+            // No-op
         }
         return null;
     }
 
     private Node getXroadHeaderNode(SOAPHeader soapHeader, String elementName) {
         return single(soapHeader.getElementsByTagNameNS(XROAD_NAMESPACE, elementName));
-    }
-
-    private Node findXroadHeaderNode(SOAPHeader soapHeader, String elementName) {
-        NodeList list = soapHeader.getElementsByTagNameNS(XROAD_NAMESPACE, elementName);
-        if (list.getLength() > 0) {
-            // TODO: Ugly to get first and ignore rest
-            return list.item(0);
-        }
-        return null;
     }
 
     private Dispatch<SOAPMessage> getDispatch(String endpointUrl) {
