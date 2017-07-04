@@ -1,5 +1,5 @@
 /**
- * MIT License Copyright (c) 2016 Solita Oy
+ * MIT License Copyright (c) 2017 Solita Oy
  */
 package fi.solita.mule.modules.xroad;
 
@@ -18,6 +18,27 @@ public class XRoadConnectorConfig {
      */
     @Configurable
     private String endpointUrl;
+
+    /**
+     * Path to the trust store. E.g. keystore.jks
+     */
+    @Configurable
+    @Optional
+    private String trustStorePath;
+
+    /**
+     * Password of the trust store.
+     */
+    @Configurable
+    @Optional
+    private String trustStorePassword;
+
+    /**
+     * Type of the trust store. E.g. JKS
+     */
+    @Configurable
+    @Optional
+    private String trustStoreType;
 
     /**
      * X-Road header
@@ -115,6 +136,30 @@ public class XRoadConnectorConfig {
         this.endpointUrl = endpointUrl;
     }
 
+    public String getTrustStorePath() {
+        return trustStorePath;
+    }
+
+    public void setTrustStorePath(String trustStorePath) {
+        this.trustStorePath = trustStorePath;
+    }
+
+    public String getTrustStorePassword() {
+        return trustStorePassword;
+    }
+
+    public void setTrustStorePassword(String trustStorePassword) {
+        this.trustStorePassword = trustStorePassword;
+    }
+
+    public String getTrustStoreType() {
+        return trustStoreType;
+    }
+
+    public void setTrustStoreType(String trustStoreType) {
+        this.trustStoreType = trustStoreType;
+    }
+    
     public String getClientXroadInstance() {
         return clientXroadInstance;
     }

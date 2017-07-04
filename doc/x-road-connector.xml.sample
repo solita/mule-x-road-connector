@@ -1,5 +1,5 @@
 <!-- BEGIN_INCLUDE(x-road:send-message) -->
-    <x-road:x-road name="Xroad_config" endpointUrl="${endpoint.lipa}"
+    <x-road:x-road name="Xroad_config" endpointUrl="${endpoint.lipa}" trustStorePath="keystore.jks" trustStorePassword="${trustPasswd}" trustStoreType="JKS"
         clientXroadInstance="${lipa.instance}" clientMemberClass="${lipa.client.memberClass}"
         clientMemberCode="${lipa.client.memberCode}" clientSubsystemCode="${lipa.client.subsystemCode}"
         serviceXroadInstance="${lipa.instance}" serviceMemberClass="${lipa.service.x.memberClass}"

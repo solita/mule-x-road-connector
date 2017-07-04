@@ -1,8 +1,13 @@
 /**
- * MIT License Copyright (c) 2016 Solita Oy
+ * MIT License Copyright (c) 2017 Solita Oy
  */
 package fi.solita.mule.modules.xroad;
 
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.SSLSocketFactory;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -20,6 +25,12 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.jaxws.DispatchImpl;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.mule.api.lifecycle.CreateException;
+import org.mule.api.security.tls.TlsConfiguration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -45,7 +56,7 @@ public class XRoadClient {
 
     private JAXBContext xRoadContext = null;
 
-    public Result send(Object payload, XRoadHeaders xRoadHeaders, String endpointUrl) {
+    public Result send(Object payload, XRoadHeaders xRoadHeaders, XRoadConnectorConfig config) {
         try {
             xRoadHeaders.validate();
             MessageFactory mf = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
@@ -59,14 +70,14 @@ public class XRoadClient {
 
             request.saveChanges();
 
-            SOAPMessage response = getDispatch(endpointUrl).invoke(request);
+            SOAPMessage response = configureDispatch(config).invoke(request);
 
             XRoadHeaders responseHeaders = parseHeaders(response.getSOAPHeader());
             Result result = new Result(response.getSOAPBody().extractContentAsDocument(),
                     responseHeaders);
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to send message ", e);
+            throw new RuntimeException("Failed to send message ", (e.getCause() != null ? e.getCause() : e));
         }
     }
 
@@ -123,18 +134,35 @@ public class XRoadClient {
         return single(soapHeader.getElementsByTagNameNS(XROAD_NAMESPACE, elementName));
     }
 
-    private Dispatch<SOAPMessage> getDispatch(String endpointUrl) {
+    private Dispatch<SOAPMessage> configureDispatch(XRoadConnectorConfig config) throws IOException, KeyManagementException, NoSuchAlgorithmException, CreateException {
         QName serviceName = new QName("", "");
         QName portName = new QName("", "");
         Service service = Service.create(serviceName);
+        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, config.getEndpointUrl());
+        DispatchImpl<SOAPMessage> dispatch = (DispatchImpl<SOAPMessage>) service.createDispatch(portName, SOAPMessage.class, Service.Mode.MESSAGE);        
 
-        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, endpointUrl);
-        Dispatch<SOAPMessage> dispatch = service.createDispatch(portName, SOAPMessage.class,
-                Service.Mode.MESSAGE);
+        if (StringUtils.startsWithIgnoreCase(config.getEndpointUrl(), "https") && config.getTrustStorePath() != null) {
+	    	HTTPConduit httpConduit = (HTTPConduit) dispatch.getClient().getConduit();
+	    	TLSClientParameters tlsParams = new TLSClientParameters();
+	    	SSLSocketFactory sslFact = initializeSocketFactory(config);
+	    	tlsParams.setSSLSocketFactory(sslFact);
+	    	tlsParams.setUseHttpsURLConnectionDefaultSslSocketFactory(false);
+	    	httpConduit.setTlsClientParameters(tlsParams);
+        }
+
         return dispatch;
     }
 
-    private void buildBody(Object payload, SOAPBody body) throws JAXBException, SOAPException {
+    private SSLSocketFactory initializeSocketFactory(XRoadConnectorConfig config) throws IOException, KeyManagementException, NoSuchAlgorithmException, CreateException {
+    	TlsConfiguration tlsConfig = new TlsConfiguration("xrd_" + config.getTrustStorePath());
+    	tlsConfig.setTrustStore(config.getTrustStorePath());
+    	tlsConfig.setTrustStorePassword(config.getTrustStorePassword());
+    	tlsConfig.setTrustStoreType(config.getTrustStoreType());
+    	tlsConfig.initialise(true, "xrd");
+    	return tlsConfig.getSocketFactory();
+	}
+
+	private void buildBody(Object payload, SOAPBody body) throws JAXBException, SOAPException {
         if (payload instanceof Document) {
             Document document = (Document) payload;
             body.addDocument(document);

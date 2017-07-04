@@ -78,9 +78,7 @@ public class XRoadConnector {
                 serviceXroadInstance, serviceMemberClass, serviceMemberCode, serviceSubsystemCode,
                 serviceServiceCode, serviceServiceVersion, async, userId, protocolVersion);
 
-        Result response = config.getClient().send(payload,
-                config.getXRoadHeaders().merge(overridedHeaders),
-                config.getEndpointUrl());
+        Result response = config.getClient().send(payload, config.getXRoadHeaders().merge(overridedHeaders), config);
 
         fillOutboundHeaders(muleEvent.getMessage(), response.headers);
 

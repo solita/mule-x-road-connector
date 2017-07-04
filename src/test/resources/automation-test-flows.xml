@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:x-road="http://www.mulesoft.org/schema/mule/x-road" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+    xmlns:x-road="http://www.mulesoft.org/schema/mule/x-road" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 http://www.mulesoft.org/schema/mule/x-road http://www.mulesoft.org/schema/mule/x-road/current/mule-x-road.xsd
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="9090" doc:name="HTTP Listener Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration"  host="0.0.0.0" port="9090" doc:name="HTTP Listener Configuration"/>
+    <http:listener-config name="HTTPS_Listener_Configuration" protocol="HTTPS" host="0.0.0.0" port="8090" doc:name="HTTPS Listener Configuration">
+        <tls:context>
+            <tls:key-store path="keystore.jks" password="changeit" keyPassword="changeit" alias="selfsigned" type="jks"/>
+        </tls:context>
+    </http:listener-config>
 
     <context:property-placeholder location="automation-credentials.properties" />
 
-    <x-road:x-road name="X_Road__Configuration" endpointUrl="${x-road.endpointUrl}"
+    <x-road:x-road name="X_Road__Configuration" endpointUrl="${x-road.endpointUrl}" trustStorePath="keystore.jks" trustStorePassword="changeit" trustStoreType="JKS"
         clientXroadInstance="${x-road.clientXroadInstance}" clientMemberClass="${x-road.clientMemberClass}" clientMemberCode="${x-road.clientMemberCode}" clientSubsystemCode="${x-road.clientSubsystemCode}"
         serviceXroadInstance="${x-road.serviceXroadInstance}" serviceMemberClass="${x-road.serviceMemberClass}" serviceMemberCode="${x-road.serviceMemberCode}" serviceSubsystemCode="${x-road.serviceSubsystemCode}" userId="automationTest" doc:name="X-Road: Configuration"/>
-    
 
 	<flow name="send-HelloServiceMessage" >
 	    <set-payload value="#['&lt;ns2:helloService xmlns:ns2=&quot;http://test.x-road.fi/producer&quot;&gt;&lt;request&gt;&lt;name&gt;Solita&lt;/name&gt;&lt;/request&gt;&lt;/ns2:helloService&gt;']" doc:name="Set helloService payload"/>
@@ -31,20 +37,20 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	    <x-road:send-message config-ref="X_Road__Configuration" doc:name="X-Road" serviceServiceCode="getRandom" serviceServiceVersion="v1"/>
     </flow>
 
-    <flow name="lipa-mock">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
-        <!-- TODO: Why this is prototypeobject? -->
-        <component>
-            <prototype-object class="fi.solita.mule.modules.xroad.LipaMockComponent" />
-        </component>
-        <set-payload value="#[payload]" />
-        <object-to-byte-array-transformer mimeType="text/xml" encoding="UTF-8" />
-        <set-property propertyName="Content-Type" value="text/xml" />
-        <set-property propertyName="http.status" value="200" />
+    <flow name="securityServer-mock">
+        <composite-source doc:name="Composite Source">
+            <http:listener config-ref="HTTPS_Listener_Configuration" path="/" doc:name="HTTPS"/>
+            <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
+        </composite-source>
+        <component doc:name="Java: SecurityServerMock" class="fi.solita.mule.modules.xroad.LipaMockComponent" />
+        <set-payload value="#[payload]" doc:name="Set Payload"/>
+        <object-to-byte-array-transformer mimeType="text/xml" encoding="UTF-8" doc:name="Object to Byte Array"/>
+        <set-property propertyName="Content-Type" value="text/xml" doc:name="Property"/>
+        <set-property propertyName="http.status" value="200" doc:name="Property"/>
 
-        <catch-exception-strategy>
-            <set-property propertyName="http.status" value="500" />
-            <set-payload value="Call failed (exception : #[exception.getMessage()]" />
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-property propertyName="http.status" value="500" doc:name="Property"/>
+            <set-payload value="Call failed (exception : #[exception.getMessage()]" doc:name="Set Payload"/>
         </catch-exception-strategy>
     </flow>
  
