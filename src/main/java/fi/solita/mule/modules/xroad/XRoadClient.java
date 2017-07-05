@@ -77,7 +77,8 @@ public class XRoadClient {
                     responseHeaders);
             return result;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to send message ", (e.getCause() != null ? e.getCause() : e));
+        	Throwable notify = e.getCause() != null ? e.getCause() : e;
+            throw new RuntimeException("Failed to send message: " + notify.getMessage(), notify);
         }
     }
 

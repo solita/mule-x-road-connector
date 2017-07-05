@@ -1,3 +1,10 @@
 target/
 .project
 .classpath
+.metadata/
+src/main/app/mule-app.properties
+src/main/app/mule-deploy.properties
+studio_id.xml
+build.properties
+mule-project.xml
+META-INF/MANIFEST.MF
