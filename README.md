@@ -3,7 +3,7 @@
 MuleSoft Connector for consuming services from X-Road in Finland. See: https://esuomi.fi/suomi-fi-services/suomi-fi-data-exchange-layer/?lang=en
 
 # Mule supported versions
-Mule 3.5.x, 3.6.x, 3.7.x, 3.8.x
+Mule 3.5.x, 3.6.x, 3.7.x, 3.8.x, 3.9.x
 
 # Security Server (Liityntäpalvelin) supported versions:
 Security Server >= 6.7.x
@@ -17,6 +17,7 @@ Open Anypoint Studio, go to Help 'Install New Software' and select Anypoint Conn
 
 # Usage
 Build the connector with MuleSoft's Anypoint Studio and attach it to your project with the built jar-file.
+In order to build a community version of the connector, change the category parameter from pom.xml to: Community
 
 Example usage from a Mule project:
 
